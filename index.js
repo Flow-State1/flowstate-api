@@ -28,7 +28,7 @@ app.use("/subscribe", subscribe);
 //Adding recorded unit to database
 app.post('/api/record', (req, res, next) => {
   const figure = new Figures({
-    kWh: req.body.KWh,
+    kwh: req.body.kwh,
     date: req.body.date
   });
   figure.save().then(
@@ -46,6 +46,34 @@ app.post('/api/record', (req, res, next) => {
   );
 });
 
-// app.listen(port, () => {
-//   console.log("Server is listening on port ${port}");
-// })
+//Fetching everything in the database
+app.get('/api/everything', (req, res, next) => {
+  Figures.find().then(
+    (figures) => {
+      res.status(200).json(figures);
+    }
+  ).catch(
+    (error) => {
+      res.status(400).json({
+        error: error
+      });
+    }
+  );
+});
+
+//Finding a record by specific date
+app.get('/api/record/:date', (req, res, next) => {
+  Figures.find({
+    _date: req.params.date
+  }).then(
+    (figure) => {
+      res.status(200).json(figure);
+    }
+  ).catch(
+    (error) => {
+      res.status(404).json({
+        error: error
+      });
+    }
+  );
+});
