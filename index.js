@@ -64,7 +64,7 @@ app.get('/api/everything', (req, res, next) => {
 //Finding a record by specific date
 app.get('/api/record/:date', (req, res, next) => {
   Figures.find({
-    _date: req.params.date
+    date: req.params.date
   }).then(
     (figure) => {
       res.status(200).json(figure);
