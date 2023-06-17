@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const db =
-  "mongodb+srv://dswfullstack:FullstackDSW2023@flowstate.1gxjqhm.mongodb.net/flowstate?retryWrites=true&w=majority";
+require("dotenv").config()
+const db = process.env.DB;
 const app = express();
 const port = process.env.PORT || 3001;
 app.use(bodyParser.json());
