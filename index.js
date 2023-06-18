@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 var cors = require("cors");
 const publish = require("./router/publisherRouter");
 const subscribe = require("./router/subscriberRouter");
-const Figures = require("./models/powerFigures")
+const figures = require("./router/figuresRouter");
 
 //Connecting to the db
 mongoose
@@ -24,56 +24,6 @@ mongoose
 app.use([cors()]);
 app.use("/publish", publish);
 app.use("/subscribe", subscribe);
+app.use("/figures",figures);
 
-//Adding recorded unit to database
-app.post('/api/record', (req, res, next) => {
-  const figure = new Figures({
-    kwh: req.body.kwh,
-    date: req.body.date
-  });
-  figure.save().then(
-    () => {
-      res.status(201).json({
-        message: 'Post saved successfully!'
-      });
-    }
-  ).catch(
-    (error) => {
-      res.status(400).json({
-        error: error
-      });
-    }
-  );
-});
 
-//Fetching everything in the database
-app.get('/api/everything', (req, res, next) => {
-  Figures.find().then(
-    (figures) => {
-      res.status(200).json(figures);
-    }
-  ).catch(
-    (error) => {
-      res.status(400).json({
-        error: error
-      });
-    }
-  );
-});
-
-//Finding a record by specific date
-app.get('/api/record/:date', (req, res, next) => {
-  Figures.find({
-    date: req.params.date
-  }).then(
-    (figure) => {
-      res.status(200).json(figure);
-    }
-  ).catch(
-    (error) => {
-      res.status(404).json({
-        error: error
-      });
-    }
-  );
-});
