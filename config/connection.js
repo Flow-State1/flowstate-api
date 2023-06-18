@@ -1,12 +1,15 @@
 var mqtt = require('mqtt');
+require('dotenv').config()
+
+
 
 var options = {
     
-    host: 'cc0c0d711929454a9a6978569baa3c03.s2.eu.hivemq.cloud',
-    port: 8883,
-    protocol: 'mqtts',
-    username: 'dswfullstack',
-    password: 'FullstackDSW2023'
+    host: process.env.HOST,
+    port: process.env.PRT,
+    protocol: process.env.PROTOCOL,
+    username: process.env.UID,
+    password: process.env.PASSWORD
 }
 
 var client = mqtt.connect(options);
