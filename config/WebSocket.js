@@ -1,9 +1,12 @@
 const WebSocket = require('ws');
 const MQTTClient = require('./MQTTConnection');
 require("dotenv").config()
+const mqtt_message = JSON.stringify(process.env.MESSAGE1)
 
 const CreateWebSocketServer  = (server,port)=>{
     const WebSocketServer = new WebSocket.Server({server});
+
+    console.log("Web socket listening on ",port);
 
     //Check for connection to web socket
     WebSocketServer.on('connection',(ws)=>{
@@ -11,10 +14,7 @@ const CreateWebSocketServer  = (server,port)=>{
         
         //Handle messages sent to server
         ws.on('message',(message)=>{
-            let msgObj = message.toString();
-            let json = JSON.parse(msgObj);
-            let mqtt_topic = json.topic;
-
+            // console.log("Message from client: ",message.toString());
             //Receive the messages that were published to the mqtt server under the message the client is subscribed to
             MQTTClient.on('message',(topic,message)=>{
 
@@ -22,16 +22,18 @@ const CreateWebSocketServer  = (server,port)=>{
                 WebSocketServer.clients.forEach(function each(client) {
                     if (client !== ws && client.readyState === WebSocket.OPEN) {
                       client.send(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
+                      console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
                     }
                 });
             })
 
+            // console.log(`Publishing:\ntopic:${process.env.TOPIC1}\n${mqtt_message}`);
             //Publish and subscrirbe
             MQTTClient.publish(
-                process.env.TOPIC1,
-                process.env.MESSAGE1
+                process.env.PUBLISHERTOPIC1.toString(),
+                process.env.MESSAGE1.toString()
             );
-            MQTTClient.subscribe(mqtt_topic);
+            MQTTClient.subscribe(process.env.SUBSCRIBERTOPIC1.toString());
         })
         
     })
