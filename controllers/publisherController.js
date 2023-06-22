@@ -1,5 +1,5 @@
 const Consumption = require('../models/consumption');
-const publisher = require('../config/connection');
+const publisher = require('../config/MQTTConnection');
 
 //This function publishes a message to via the MQTT broker to the mongodb database
 const publish_message_post = (request,response)=>{
