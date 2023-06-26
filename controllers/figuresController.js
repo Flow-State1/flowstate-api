@@ -56,8 +56,26 @@ const get_records_by_date = (req, res) => {
   );
 }
 
+//Get Record by date range
+const get_records_by_dateRange = (req, res) => {
+  Figures.find({
+    date: { $gte: req.params.date, $lte: req.params.date2 }
+  }).then(
+    (figure) => {
+      res.status(200).json(figure);
+    }
+  ).catch(
+    (error) => {
+      res.status(404).json({
+        error: error
+      });
+    }
+  );
+}
+
 module.exports = {
     get_records,
     get_records_by_date,
-    add_record
+    add_record,
+    get_records_by_dateRange
 }
