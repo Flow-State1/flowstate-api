@@ -39,6 +39,7 @@ mongoose
 WebSocketServer(server, port);
 
 //Routes
+app.use(express.json()); //To allow data to be received and processed in json format
 app.use([cors()]);
 app.use("/publish", publish);
 app.use("/subscribe", subscribe);

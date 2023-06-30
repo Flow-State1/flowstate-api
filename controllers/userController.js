@@ -1,4 +1,3 @@
-const User = require('./../models/user');
 
 //Functions that perform CRUD operations based on users
 const getAllUsers = (req, res) => {
