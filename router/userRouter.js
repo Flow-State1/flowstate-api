@@ -3,7 +3,7 @@ const userRouter = express.Router();
 const userController = require("./../controllers/userController");
 const authController = require("./../controllers/authController");
 
-//Endpoint relevant for authentication
+//Endpoint relevant for sign up authentication
 userRouter.post('/signup', authController.signup);
 
 //Endpoint retrieves all users from the DB and creates a user

@@ -1,5 +1,5 @@
 
-//Functions that perform CRUD operations based on users
+//Functions that perform CRUD operations related on users
 const getAllUsers = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -35,4 +35,10 @@ const deleteUser = (req, res) => {
   });
 };
 
-module.exports = {getAllUsers, getUser, createUser, updateUser, deleteUser}
+module.exports = {
+  getAllUsers, 
+  getUser, 
+  createUser, 
+  updateUser, 
+  deleteUser
+}
