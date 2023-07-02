@@ -5,6 +5,10 @@ const authController = require("./../controllers/authController");
 
 //Endpoint relevant for sign up authentication
 userRouter.post('/signup', authController.signup);
+userRouter.post('/login', authController.login);
+
+userRouter.post('/forgotPassword', authController.forgotPassword);
+userRouter.post('/resetPassword', authController.resetPassword);
 
 //Endpoint retrieves all users from the DB and creates a user
 userRouter
