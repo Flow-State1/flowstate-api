@@ -10,6 +10,7 @@ const CreateWebSocketServer  = (server,port)=>{
 
     //Check for connection to web socket
     WebSocketServer.on('connection',(ws)=>{
+        
         console.log("New Client Connected to Web Socket Server");
         
         //Handle messages sent to server
@@ -22,7 +23,7 @@ const CreateWebSocketServer  = (server,port)=>{
                 WebSocketServer.clients.forEach(function each(client) {
                     if (client !== ws && client.readyState === WebSocket.OPEN) {
                       client.send(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
-                      console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
+                    //   console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
                     }
                 });
             })
