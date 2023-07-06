@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
     passwordResetExpires: Date
 }, {timestamps: true});
 
-//Used the pre middleware to handle the encryption between getting the data and saving to database
+//Used the pre middleware method to handle the encryption between getting the data and saving to database
 userSchema.pre('save', async function(next) {
     if(!this.isModified('password')) return next();
 
@@ -49,17 +49,20 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
-//An instance method, is available on all documents of a certain collection
+//An instance method that handles user password comparison, it's available on all documents of a certain collection
 userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 //Instance method that handles user password reset token
 userSchema.methods.createPasswordResetToken = function() {
+    //Generate the reset token, converts to string hexadecimal for less memory usage
     const resetToken = crypto.randomBytes(32).toString('hex');
 
+    //Hash the reset token using SHA-256 algorithm, then update the reset token to the hashed token
     this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     console.log({resetToken}, this.passwordResetToken);
+
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000; //The user only has 10 minutes to reset their password
 
     return resetToken;

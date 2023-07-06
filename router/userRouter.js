@@ -7,8 +7,9 @@ const authController = require("./../controllers/authController");
 userRouter.post('/signup', authController.signup);
 userRouter.post('/login', authController.login);
 
+//Endpoint relevant for password resetting operations
 userRouter.post('/forgotPassword', authController.forgotPassword);
-userRouter.post('/resetPassword', authController.resetPassword);
+userRouter.patch('/resetPassword/:token', authController.resetPassword);
 
 //Endpoint retrieves all users from the DB and creates a user
 userRouter
