@@ -18,12 +18,15 @@ const CreateWebSocketServer  = (server,port)=>{
             // console.log("Message from client: ",message.toString());
             //Receive the messages that were published to the mqtt server under the message the client is subscribed to
             MQTTClient.on('message',(topic,message)=>{
-
+                // console.log("MQTT Working");
                 //Send the received mqtt payload to all the clients that are connected to the websocket server
                 WebSocketServer.clients.forEach(function each(client) {
-                    if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    // console.log(client);
+                    if (client === ws && client.readyState === WebSocket.OPEN) {
                       client.send(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
                     //   console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
+                    }else{
+                        console.log("Clients websockets not open");
                     }
                 });
             })
