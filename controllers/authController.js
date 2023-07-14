@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/user');
@@ -12,6 +13,18 @@ const signToken = id => {
     });
 }
 
+// Reduced the signToken function by implementing one fucntion and call it to relevant endpoints
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user._id);  
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        data: {
+            user
+        }
+    });
+}
+
 exports.signup = (async (req, res, next) => {
     try {
         // User creation using the User object from the userSchema, allows us to use methods of create()
@@ -22,16 +35,8 @@ exports.signup = (async (req, res, next) => {
             password: req.body.password,
             confirmPassword: req.body.confirmPassword
         });
-        const token = signToken(newUser._id);
-
         // Parse token to the user after succuessful creation and sign them in
-        res.status(201).json({
-            status: 'success',
-            token,
-            data: {
-                user: newUser
-            }
-        });
+        createSendToken(newUser, 201, res);
     }
     catch(err){
         console.log(err);
@@ -63,16 +68,51 @@ exports.login = (async (req, res, next) => {
         }
 
         // 3. If every condition is met, call the signToken method and send token to client/user
-        const token = signToken(user._id);
-        res.status(200).json({
-            status: 'success',
-            token
-        });
+        createSendToken(user, 200, res);
     }
     catch(err){
         console.log(err);
     }
 });
+
+// Middleware function that handles protected routes, by ensuring the user making the request is authenticated and authorized
+exports.protect = (async (req, res, next) => {
+    // 1. Getting token from the request headers and check if it exists
+    let token;
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token = req.headers.authorization.split(' ')[1];
+    }
+
+    if(!token) {
+        return next(res.status(401).json({
+            status: 'fail',
+            message: 'You are not logged in! Please log in to get access'
+        }));
+    }
+    
+    // 2. Verification of the token, allows us to get access to tokens data e.g user information
+    const decoded = await promisify(jwt.verify)(token, secret);
+
+    // 3. Check if user still exists in the database based on the decoded token
+    const currentUser = await User.findById(decoded.id);
+    if(!currentUser) {
+        return next(res.status(401).json({
+            status: 'fail',
+            message: 'The user belonging to this token does no longer exist'
+        }));
+    }
+    // 4. Check if changed password after the token was issued
+    if(currentUser.changedPasswordAfter(decoded.iat)) {
+        return next(res.status(401).json({
+            status: 'fail',
+            message: 'User recently changed password!. Please log in again'
+        }));
+    }
+    // Grant access to protected route
+    req.user = currentUser;
+    next();
+});
+
 
 exports.forgotPassword = (async (req, res, next) => {
     try {
@@ -130,14 +170,14 @@ exports.forgotPassword = (async (req, res, next) => {
 exports.resetPassword = (async (req, res, next) => {
     // 1. Get user based on the token
     //Hash the token from params to match the one on the database
-    const hasedToken = crypto
+    const hashedToken = crypto
         .createHash('sha256')
         .update(req.params.token)
         .digest('hex');
 
     //Find the user for the token and check if the token has not expired
     const user = await User.findOne({ 
-        passwordResetToken: hasedToken, 
+        passwordResetToken: hashedToken, 
         passwordResetExpires: {$gt: Date.now()} 
     });
 
@@ -160,9 +200,32 @@ exports.resetPassword = (async (req, res, next) => {
     // 3. Update changedPasswordAt property for the user
 
     // 4. Log the user in, send JWT
-    const token = signToken(user._id);
-    res.status(200).json({
-        status: 'success',
-        token
-    });
+    createSendToken(user, 200, res);
+});
+
+exports.updatePassword = (async (req, res, next) => {
+    try {
+        // 1. Get/query the user from the collection by their id
+        const user = await User.findById(req.user.id).select('+password');
+
+        // 2. Check if the POSTed current password is correct
+        if (!(await user.correctPassword(req.body.currentPassword, user.password))){
+            return next(res.status(401).json({
+                status: 'fail',
+                message: 'Your current password is wrong'
+            }));
+        }
+
+        // 3. If password correct, then allow user to update 
+        user.password = req.body.password;
+        user.confirmPassword = req.body.confirmPassword;
+        await user.save();
+        
+        // 4. Log user in with the new password by sending a JWT
+        createSendToken(user, 200, res);
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
 });
