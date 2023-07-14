@@ -11,6 +11,10 @@ userRouter.post('/login', authController.login);
 userRouter.post('/forgotPassword', authController.forgotPassword);
 userRouter.patch('/resetPassword/:token', authController.resetPassword);
 
+//Endpoint relevant for updating authenticated users, hense the route is protected
+userRouter.patch('/updateMyPassword', authController.protect, authController.updatePassword);
+userRouter.patch('/updateMe', authController.protect, userController.updateMe);
+
 //Endpoint retrieves all users from the DB and creates a user
 userRouter
   .route('/')

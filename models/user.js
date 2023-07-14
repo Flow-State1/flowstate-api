@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         validate: [validator.isEmail, 'Please provide a valid email']
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     password: {
         type: String,
         required: [true, 'Please provide a password'],
@@ -49,9 +54,9 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
+//Checks if password has been modified or there is a new user
 userSchema.pre('save', function(next) {
     if(!this.isModified('password') || this.isNew) return next();
-
     this.passwordChangedAt = Date.now() - 1000;
     next();
 });
@@ -60,6 +65,15 @@ userSchema.pre('save', function(next) {
 userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };
+
+//Check if user has changed their password after the token was issued by comparing the times 
+userSchema.methods.changedPasswordAfter = function(JWTTimestap) {
+    if(this.passwordChangedAt) {
+        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+        return JWTTimestap < changedTimestamp;
+    }
+    return false;
+}
 
 //Instance method that handles user password reset token
 userSchema.methods.createPasswordResetToken = function() {
@@ -71,7 +85,6 @@ userSchema.methods.createPasswordResetToken = function() {
     console.log({resetToken}, this.passwordResetToken);
 
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000; //The user only has 10 minutes to reset their password
-
     return resetToken;
 };
 
