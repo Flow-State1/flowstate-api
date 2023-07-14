@@ -15,6 +15,9 @@ userRouter.patch('/resetPassword/:token', authController.resetPassword);
 userRouter.patch('/updateMyPassword', authController.protect, authController.updatePassword);
 userRouter.patch('/updateMe', authController.protect, userController.updateMe);
 
+//Endpoint relevant for deleting authenticated users, hense the route is protected
+userRouter.delete('/deleteMe', authController.protect, userController.deleteMe);
+
 //Endpoint retrieves all users from the DB and creates a user
 userRouter
   .route('/')
@@ -26,6 +29,6 @@ userRouter
   .route('/:id')
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+  .delete(authController.protect, userController.deleteUser);
 
 module.exports = userRouter;

@@ -39,7 +39,12 @@ const userSchema = new mongoose.Schema({
     },
     passwordChangedAt: Date,
     passwordResetToken: String,
-    passwordResetExpires: Date
+    passwordResetExpires: Date,
+    active: {
+        type : Boolean,
+        default: true,
+        select: false
+    }
 }, {timestamps: true});
 
 //Used the pre middleware method to handle the encryption between getting the data and saving to database
@@ -51,6 +56,14 @@ userSchema.pre('save', async function(next) {
 
     //Remove the confirm password field from database after validation
     this.confirmPassword = undefined;
+    next();
+});
+
+//Query middleware function that runs before a query that starts with `find`
+//It ensures we return users that are active (active status is not equals to false)
+userSchema.pre(/^find/, function(next) {
+    //this points to the current query(find)
+    this.find({ active: {$ne : false} });
     next();
 });
 
