@@ -34,7 +34,7 @@ const getAllUsers = (async (req, res) => {
 });
 
 //Function to allow the authenticated user to update their details
-const updateMe = (async (req,res,next) => {
+const updateMe = (async (req, res, next) => {
   try {
     // 1. Create an error if user trys (POSTs) to update password
     if(req.body.password || req.body.passwordConfirm) {
@@ -60,6 +60,16 @@ const updateMe = (async (req,res,next) => {
   }
 });
 
+//Function for deactivating the user when they delete their account
+const deleteMe = (async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, {active: false});
+
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+});
+
 const getUser = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -81,12 +91,13 @@ const updateUser = (req, res) => {
   });
 };
 
-const deleteUser = (req, res) => {
+const deleteUser = (async (req, res) => {
   res.status(500).json({
     status: 'error',
     message: 'This route is not defined'
   });
-};
+  
+});
 
 module.exports = {
   getAllUsers,
@@ -94,5 +105,6 @@ module.exports = {
   getUser, 
   createUser, 
   updateUser, 
-  deleteUser
+  deleteUser,
+  deleteMe
 }
