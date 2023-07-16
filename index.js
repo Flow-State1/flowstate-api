@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 require("dotenv").config();
 const db = process.env.DB;
 const app = express();
@@ -16,12 +18,24 @@ const http = require("http");
 const server = http.createServer(app);
 const WebSocketServer = require("./config/WebSocket");
 
+//Set security HTTP headers
+app.use(helmet());
+
 //Testing the server with Postman
 app.get('/', (req, res) => {
   res.status(200).json({
     message: `From the server side listening to port ${port}`
   });
 });
+
+//Auth Middleware - Only allow 100 requests in an hour
+//To prevent attacks e.g brute force
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many request from this IP, Try again later'
+});
+app.use('/users', limiter);
 
 //Connecting to the db
 mongoose
