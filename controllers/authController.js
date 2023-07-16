@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./../models/user');
 const secret = process.env.JWT_SECRET;
 const expiration = process.env.JWT_EXPIRES_IN;
+const cookieExpiration = process.env.JWT_COOKIE_EXPIRES_IN;
 const sendEmail = require('./../utils/email');
 
 // Functions generates and returns a token based on the user's id as input and uses the secret key for signing the token
@@ -15,7 +16,21 @@ const signToken = id => {
 
 // Reduced the signToken function by implementing one fucntion and call it to relevant endpoints
 const createSendToken = (user, statusCode, res) => {
-    const token = signToken(user._id);  
+    const token = signToken(user._id);
+    //This will only work if our web app is hosted, so that cookies are sent in https
+    const cookieOption = {
+        expires: new Date(
+        Date.now() + cookieExpiration * 24 * 60 * 60 * 1000
+        ),
+        //secure: true,
+        httpOnly: true
+    };
+    //Attach the cookie to the response, so the token stored securely
+    res.cookie('jwt', token, cookieOption);
+
+    //Remove password from the output when creating a user
+    user.password = undefined;
+
     res.status(statusCode).json({
         status: 'success',
         token,
