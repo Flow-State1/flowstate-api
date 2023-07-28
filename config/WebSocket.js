@@ -23,7 +23,7 @@ const CreateWebSocketServer  = (server,port)=>{
                 WebSocketServer.clients.forEach(function each(client) {
                     // console.log(client);
                     if (client === ws && client.readyState === WebSocket.OPEN) {
-                      client.send(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
+                      client.send(`${message.toString()}`);
                     //   console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
                     }else{
                         console.log("Clients websockets not open");

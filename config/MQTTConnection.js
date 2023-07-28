@@ -30,7 +30,7 @@ function disconnectFromMqtt() {
     });
   }
   // Call the disconnect function when you want to disconnect
-  disconnectFromMqtt();
+  // disconnectFromMqtt();
 });
 
 module.exports = client;
