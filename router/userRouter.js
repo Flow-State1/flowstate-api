@@ -7,8 +7,16 @@ const authController = require("./../controllers/authController");
 userRouter.post('/signup', authController.signup);
 userRouter.post('/login', authController.login);
 
+//Endpoint relevant for password resetting operations
 userRouter.post('/forgotPassword', authController.forgotPassword);
-userRouter.post('/resetPassword', authController.resetPassword);
+userRouter.patch('/resetPassword/:token', authController.resetPassword);
+
+//Endpoint relevant for updating authenticated users, hense the route is protected
+userRouter.patch('/updateMyPassword', authController.protect, authController.updatePassword);
+userRouter.patch('/updateMe', authController.protect, userController.updateMe);
+
+//Endpoint relevant for deleting authenticated users, hense the route is protected
+userRouter.delete('/deleteMe', authController.protect, userController.deleteMe);
 
 //Endpoint retrieves all users from the DB and creates a user
 userRouter
@@ -21,6 +29,6 @@ userRouter
   .route('/:id')
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+  .delete(authController.protect, userController.deleteUser);
 
 module.exports = userRouter;

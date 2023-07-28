@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const figuresController = require('../controllers/figuresController');
+const authController = require('./../controllers/authController');
 
-
-//Fetching everything in the database
-router.get('/', figuresController.get_records);
+//Fetching everything in the database - protected the get_records route by giving authorization to logged in users
+router.get('/', authController.protect, figuresController.get_records);
 
 //Adding recorded unit to database
 router.post('/record',figuresController.add_record );
