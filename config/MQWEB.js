@@ -13,26 +13,33 @@ const CreateWebSocketServer  = (server,port)=>{
         
         console.log("New Client Connected to Web Socket Server");
         
-        //Send MQTT messages via websocket, whenever the api receives messages from the device
+        //Handle messages sent to server
+        ws.on('message',(message)=>{
+            // console.log("Message from client: ",message.toString());
+            //Receive the messages that were published to the mqtt server under the message the client is subscribed to
             MQTTClient.on('message',(topic,message)=>{
-
-                //Send messages to all the devices that are connected to the web socket server
+                // console.log("MQTT Working");
+                // console.log(message);
+                //Send the received mqtt payload to all the clients that are connected to the websocket server
                 WebSocketServer.clients.forEach(function each(client) {
+                    // console.log(client);
                     if (client === ws && client.readyState === WebSocket.OPEN) {
-                      
-                      const message_ = JSON.parse(message);
-                      const src = message_.src;
-
-                      client.send(message.toString());
+                    //   client.send(`${message.toString()}`);
+                      console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
                     }else{
                         console.log("Clients websockets not open");
                     }
                 });
             })
 
-            //Add the websocket server as a subscriver to the topics of both devices
+            // console.log(`Publishing:\ntopic:${process.env.TOPIC1}\n${mqtt_message}`);
+            //Publish and subscrirbe
+            MQTTClient.publish(
+                process.env.PUBLISHERTOPIC2.toString(),
+                process.env.MESSAGE2.toString()
+            );
             MQTTClient.subscribe(process.env.SUBSCRIBERTOPIC1.toString());
-            MQTTClient.subscribe(process.env.SUBSCRIBERTOPIC2.toString());
+        })
         
     })
 
