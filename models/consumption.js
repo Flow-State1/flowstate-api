@@ -9,7 +9,7 @@ const consumptionSchema = new Schema({
         type:String,
         required:true
     },
-    message:{
+    payload:{
         type:String,
         required:true,
     }

@@ -3,7 +3,8 @@ const MQTTClient = require('./MQTTConnection');
 require("dotenv").config()
 const mqtt_message = JSON.stringify(process.env.MESSAGE1)
 
-const CreateWebSocketServer  = (server,port)=>{
+const CreateWebSocketServer  = (server,port) => {
+
     const WebSocketServer = new WebSocket.Server({server});
 
     console.log("Web socket listening on ",port);
@@ -25,8 +26,9 @@ const CreateWebSocketServer  = (server,port)=>{
                     // console.log(client);
                     if (client === ws && client.readyState === WebSocket.OPEN) {
                     //   client.send(`${message.toString()}`);
-                      console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
-                    }else{
+                        console.log(`{topic:${topic.toString()},\npayload:${message.toString()}}`);
+                    }
+                    else{
                         console.log("Clients websockets not open");
                     }
                 });
@@ -42,13 +44,9 @@ const CreateWebSocketServer  = (server,port)=>{
         })
         
     })
-
     WebSocketServer.on('close',(ws)=>{
         console.log("client disconnected");
     })
-
-
-
-}
+};
 
 module.exports = CreateWebSocketServer;
