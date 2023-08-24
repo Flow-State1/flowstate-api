@@ -8,11 +8,12 @@ const db = process.env.DB;
 const app = express();
 const port = process.env.PORT || 3002;
 app.use(bodyParser.json());
-var cors = require("cors");
+const cors = require("cors");
 const publish = require("./router/publisherRouter");
 const subscribe = require("./router/subscriberRouter");
 const figures = require("./router/figuresRouter");
 const userRouter = require("./router/userRouter");
+const consumptions = require('./router/consumptionRouter');
 //Create an http server with the express app
 const http = require("http");
 const server = http.createServer(app);
@@ -56,9 +57,10 @@ mongoose
 WebSocketServer(server, port);
 
 //Routes
+app.use(cors({credentials: true,}));
 app.use(express.json()); //To allow data to be received and processed in json format
-app.use([cors()]);
 app.use("/publish", publish);
 app.use("/subscribe", subscribe);
 app.use("/figures", figures);
 app.use('/users', userRouter);
+app.use('/consumptions', consumptions);

@@ -45,12 +45,16 @@ exports.signup = (async (req, res, next) => {
     try {
         // User creation using the User object from the userSchema, allows us to use methods of create()
         // Details properties are extracted from the `req.body`, it represents body of a http request sent by the client
-        const newUser = await User.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            confirmPassword: req.body.confirmPassword
-        });
+        const { name, email, password, confirmPassword } = req.body;
+
+        if(password != confirmPassword) {
+            return next(res.status(400).json({
+                status: 'fail',
+                message: "Passwords do not match"
+            }));
+        }
+        
+        const newUser = await User.create({name, email, password, confirmPassword});
         // Parse token to the user after succuessful creation and sign them in
         createSendToken(newUser, 201, res);
     }
@@ -68,7 +72,7 @@ exports.login = (async (req, res, next) => {
         if (!email || !password) {
             return next(res.status(400).json({
                 status: 'fail',
-                message: 'Please provide email and password'
+                message: 'Provide email and password'
             }));
         }
 
@@ -245,3 +249,5 @@ exports.updatePassword = (async (req, res, next) => {
         console.log(err);
     }
 });
+
+exports.logout = (async (req, res, next) => {});

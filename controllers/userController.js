@@ -63,7 +63,6 @@ const updateMe = (async (req, res, next) => {
 //Function for deactivating the user when they delete their account
 const deleteMe = (async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, {active: false});
-
   res.status(204).json({
     status: 'success',
     data: null
