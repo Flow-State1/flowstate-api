@@ -47,6 +47,14 @@ exports.signup = (async (req, res, next) => {
         // Details properties are extracted from the `req.body`, it represents body of a http request sent by the client
         const { name, email, password, confirmPassword } = req.body;
 
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                status: 'fail',
+                message: "Account already exists" 
+            });
+        }
+
         if(password != confirmPassword) {
             return next(res.status(400).json({
                 status: 'fail',
