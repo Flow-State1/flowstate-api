@@ -1,6 +1,22 @@
-// This will store the switch data
-/*
 
-"switch:0\":{\"id\":0,\"source\":\"mqtt\",\"output\":true,\"apower\":16.9,\"voltage\":236.8,\"current\":0.095,\
-"aenergy\":{\"total\":3.554,\"by_minute\":[4.968,282.668,282.668],\"minute_ts\":1692887580},\"temperature\":{\"tC\":57.6,\"tF\":135.7}}
-*/
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const Payload = mongoose.Schema;
+
+const PayloadSchema = new Schema({
+  // Date Year-Month-Day
+  date: {
+    type:String,
+    required:true
+  },
+  hours:{
+    type:Array,
+    required:true
+  },
+
+
+});
+
+const Payloads = mongoose.model('Payload',PayloadSchema)
+
+module.exports = Payloads;
