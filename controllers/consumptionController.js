@@ -1,6 +1,8 @@
 const Consumptions = require("../models/consumption");
 require("dotenv").config();
 
+
+
 // This gets all the results stored in the switch object, it returns an array with smaller arrays of a max size of 60 storing the necessary data
 const getAllConsumptions = (req, res) => {
   Consumptions.find()
