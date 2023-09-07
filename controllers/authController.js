@@ -6,7 +6,6 @@ const secret = process.env.JWT_SECRET;
 const expiration = process.env.JWT_EXPIRES_IN;
 const cookieExpiration = process.env.JWT_COOKIE_EXPIRES_IN;
 const sendEmail = require('./../utils/email');
-const { ok } = require('assert');
 
 // Functions generates and returns a token based on the user's id as input and uses the secret key for signing the token
 const signToken = id => {
@@ -145,11 +144,12 @@ exports.protect = (async (req, res, next) => {
 exports.forgotPassword = (async (req, res, next) => {
     try {
         // 1. Get user from the database based on the email provided in the request body
-        const user = await User.findOne({ email: req.body.email });
+        const {email} = req.body;
+        const user = await User.findOne({email: email});
         if(!user) {
             return next(res.status(404).json({
                 status: 'fail',
-                message: 'There is no user with email address'
+                message: 'Email does not Exist'
             }));
         }
 
