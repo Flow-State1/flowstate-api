@@ -14,7 +14,7 @@ userRouter.patch('/resetPassword/:token', authController.resetPassword);
 
 //Endpoint relevant for updating authenticated users, hense the route is protected
 userRouter.patch('/updateMyPassword', authController.protect, authController.updatePassword);
-userRouter.patch('/updateMe', authController.protect, userController.updateMe);
+userRouter.patch('/updateMe', userController.uploadUserPhoto, userController.updateMe);
 
 //Endpoint relevant for deleting authenticated users, hense the route is protected
 userRouter.delete('/deleteMe', authController.protect, userController.deleteMe);
