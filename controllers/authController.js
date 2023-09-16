@@ -35,7 +35,11 @@ const createSendToken = (user, statusCode, res) => {
         status: 'success',
         token,
         data: {
-            user
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
         }
     });
 }
@@ -108,8 +112,10 @@ exports.protect = (async (req, res, next) => {
     let token;
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
         token = req.headers.authorization.split(' ')[1];
+    } 
+    else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
     }
-
     if(!token) {
         return next(res.status(401).json({
             status: 'fail',
@@ -144,8 +150,7 @@ exports.protect = (async (req, res, next) => {
 exports.forgotPassword = (async (req, res, next) => {
     try {
         // 1. Get user from the database based on the email provided in the request body
-        const {email} = req.body;
-        const user = await User.findOne({email: email});
+        const user = await User.findOne({ email: req.body.email });
         if(!user) {
             return next(res.status(404).json({
                 status: 'fail',
@@ -163,7 +168,7 @@ exports.forgotPassword = (async (req, res, next) => {
         const resetURL = `${req.protocol}://${req.get('host')}/users/resetPassword/${resetToken}`;
         const message = `Forgot your password? Submit a PATCH request with your new password and confirmPassword to: ${resetURL}.
         \nIf you didn't forget your password, Please ignore this email`;
-
+        
         try {
             // Send email to the user containing the reset URL by passing user's email and relevant information
             await sendEmail({
@@ -258,4 +263,10 @@ exports.updatePassword = (async (req, res, next) => {
     }
 });
 
-exports.logout = (async (req, res, next) => {});
+exports.logout = (async (req, res) => {
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    });
+    res.status(200).json({ status: 'success' });
+});
