@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const mongoose = require("mongoose");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
@@ -58,7 +59,11 @@ mongoose
 WebSocketServer(server, port);
 
 //Routes
-app.use(cors({credentials: true,}));
+app.use(cors({
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+}));
+app.use(cookieParser());
 app.use(express.json()); //To allow data to be received and processed in json format
 app.use("/publish", publish);
 app.use("/subscribe", subscribe);
