@@ -36,10 +36,10 @@ const CreateWebSocketServer  = (server,port)=>{
                             payload: JSON.stringify(parsedMessage)
                         });
 
-                        //Save the new consumption instance to the database
-                        newConsumption.save().then((savedConsumption) => {
-                            console.log('Saved consumptions to database: ', savedConsumption);
-                        })
+                        // //Save the new consumption instance to the database
+                        // newConsumption.save().then((savedConsumption) => {
+                        //     console.log('Saved consumptions to database: ', savedConsumption);
+                        // })
 
                         client.send(message.toString());
                     }

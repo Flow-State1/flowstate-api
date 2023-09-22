@@ -24,6 +24,9 @@ const WebSocketServer = require("./config/WebSocket");
 //Set security HTTP headers
 app.use(helmet());
 
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+
 //Testing the server with Postman
 app.get('/', (req, res) => {
   res.status(200).json({
