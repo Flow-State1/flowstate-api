@@ -45,7 +45,7 @@ const updateMe = (async (req, res, next) => {
     }
     // 2. Update user document
     //Filtered out unwanted fields that can't be updated and  kept the name and email
-    const filteredBody = (req.body);
+    const filteredBody = filterObj(req.body, "name", "email");
     console.log("New data:",filteredBody);
     //if(req.file) filteredBody.photo = req.file.filename;
 

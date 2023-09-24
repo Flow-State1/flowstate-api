@@ -2,6 +2,7 @@ const express = require("express");
 const userRouter = express.Router();
 const userController = require("./../controllers/userController");
 const authController = require("./../controllers/authController");
+const User = require("./../models/user");
 const multer = require('multer');
 const path = require('path');
 
@@ -39,6 +40,24 @@ const uploadImage = (async (req, res, next) => {
   }
 });
 
+//Endpoint for retrieving the image from user collection
+userRouter.get('/uploads/profile-pictures/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+
+    if (!user || !user.photo) {
+      return res.status(404).send('Image not found');
+    }
+
+    res.set('Content-Type', 'image/jpeg');
+    res.send(user.photo);
+  }catch(error) {
+    console.error('Error retrieving image:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 //Endpoint relevant for sign up authentication
 userRouter.post('/signup', authController.signup);
 userRouter.post('/login', authController.login);
@@ -49,7 +68,7 @@ userRouter.post('/forgotPassword', authController.forgotPassword);
 userRouter.patch('/resetPassword/:token', authController.resetPassword);
 
 //Endpoint relevant for updating authenticated users, hense the route is protected
-userRouter.patch('/updateMyPassword', authController.protect, authController.updatePassword);
+userRouter.post('/updateMyPassword', authController.protect, authController.updatePassword);
 userRouter.post('/updateMe', authController.protect, userController.updateMe);
 
 //Endpoint for image upload
