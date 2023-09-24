@@ -10,5 +10,8 @@ router.put("/", PayloadController.updateHourGroup);
 
 //Get the consumption by date and hour group
 router.get("/", PayloadController.getGroupbyDateHour);
+router.get("/1",PayloadController.getOne)
+
+router.get("/all",PayloadController.getAll);
 
 module.exports = router;

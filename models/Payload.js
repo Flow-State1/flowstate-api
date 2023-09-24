@@ -7,6 +7,10 @@ const payloadSchema = new Schema({
     type: String,
     required: true,
   },
+  applience_id: {
+    type: String,
+    required: true,
+  },
   // Date Year-Month-Day
   date: {
     type: String,
@@ -17,7 +21,7 @@ const payloadSchema = new Schema({
     required: true,
   },
   // Array of the hour and minutes when data was added to be used and matched with the data in the data array
-  labels: {
+  labels_array: {
     type: Array,
     required: true,
   },
