@@ -245,15 +245,21 @@ exports.updatePassword = (async (req, res, next) => {
         if (!(await user.correctPassword(req.body.currentPassword, user.password))){
             return next(res.status(401).json({
                 status: 'fail',
-                message: 'Current password is incorrect'
+                message: 'Current password incorrect'
             }));
         }
 
         // 3. If password correct, then allow user to update 
         user.password = req.body.password;
         user.confirmPassword = req.body.confirmPassword;
+
+        if(user.password != user.confirmPassword) {
+            return next(res.status(401).json({
+                status: 'fail',
+                message: 'Passwords do not match'
+            }));
+        }
         await user.save();
-        
         // 4. Log user in with the new password by sending a JWT
         createSendToken(user, 200, res);
     }
