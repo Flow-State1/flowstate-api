@@ -21,8 +21,7 @@ const CreateWebSocketServer = (server, port) => {
   let first_time_running = true;
   stored_minute =
     date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-  let stored_hour =
-    date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+  let stored_hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
   let stored_topic = "initial";
   let applienceid = "";
   let applienceid1 = "";
@@ -39,7 +38,7 @@ const CreateWebSocketServer = (server, port) => {
     //Send MQTT messages via websocket, whenever the api receives messages from the device
 
     MQTTClient.on("message", async (topic, message) => {
-      // console.log("Currently Received Topic:", topic);
+      console.log("Currently Received Topic:", topic);
       let current = new Date();
       let current_minute =
         current.getMinutes() < 10
@@ -54,7 +53,7 @@ const CreateWebSocketServer = (server, port) => {
       let payload_src = payload_message["src"];
       let payload_params = payload_message["params"];
       let switch_status = payload_params["output"];
-      let power = payload_params["apower"] * 0.001; //This converts currently measure power to Kw/h
+      let power = payload_params["apower"]*0.001;//This converts currently measure power to Kw/h
       let voltage = payload_params["voltage"];
       let current_ = payload_params["current"];
       let aenergy = payload_params["aenergy"]["total"];
@@ -133,7 +132,7 @@ const CreateWebSocketServer = (server, port) => {
               if (results.length >= 2) {
                 console.log("Payloads exist");
               } else if (results.length == 0) {
-                console.log("Length at", payload_src, ": ", results.length);
+                console.log("Length at",payload_src,": ",results.length);
                 Payload.save()
                   .then((saved) => {
                     console.log("Payload created");
@@ -169,7 +168,7 @@ const CreateWebSocketServer = (server, port) => {
               if (results.length >= 2) {
                 console.log("Payloads exist");
               } else if (results.length == 0) {
-                console.log("Length at", payload_src, ": ", results.length);
+                console.log("Length at",payload_src,": ",results.length);
                 Payload.save()
                   .then((saved) => {
                     stored_hour = current_hour;
@@ -179,6 +178,7 @@ const CreateWebSocketServer = (server, port) => {
                     response.send(err);
                   });
               }
+
             } catch (err) {
               console.log(err);
             }
@@ -189,7 +189,7 @@ const CreateWebSocketServer = (server, port) => {
 
         // Read from file and and get the applience_ID and append it to the payload
       } else if (stored_hour == current_hour) {
-        // console.log("Stored hour is similar to current hour\n");
+        console.log("Stored hour is similar to current hour\n");
 
         // Check if we are still in the same inute as the previously recorded one or not
         if (stored_minute != current_minute) {
@@ -204,7 +204,7 @@ const CreateWebSocketServer = (server, port) => {
 
         //
         else if (stored_minute == current_minute) {
-          // console.log("Stored minute is similar to current minute");
+          console.log("Stored minute is similar to current minute");
           // If the current topic is not similar to the previous topic and if first time running is true, update data in the database and set first time running to false
           if (topic != stored_topic && dataRetrieved != 2) {
             console.log("Topic", stored_topic, "not recorded stored");
@@ -297,49 +297,34 @@ const CreateWebSocketServer = (server, port) => {
                       data: dataArray,
                     }
                   );
-
+                  
                   first_time_running = false;
                   dataRetrieved++;
                   stored_topic = topic;
                   WebSocketServer.clients.forEach(function each(client) {
                     if (client === ws && client.readyState === WebSocket.OPEN) {
-                      let parsedMessage;
-                      try {
-                        //Parse the incoming messages to json format
-                        let payload = {
-                          time_label: `${
-                            current.getHours() < 10
-                              ? `0${current.getHours()}`
-                              : current.getHours()
-                          }:${
-                            current.getMinutes() < 10
-                              ? `0${current.getMinutes()}`
-                              : current.getMinutes()
-                          }`,
-                          payload_src,
-                          switch_status,
-                          power,
-                          voltage,
-                          current_,
-                          aenergy,
-                        };
-                        parsedMessage = JSON.stringify(payload);
-                        client.send(parsedMessage);
-                        //let src = parsedMessage.src;
-                      } catch (error) {
-                        console.error("Error parsing MQTT message:", error);
-                        return;
-                      }
-                    } else {
-                      console.log("Clients websockets not open");
+                        let parsedMessage;
+                        try {
+                            //Parse the incoming messages to json format
+                            parsedMessage = JSON.stringify(payload);
+                            client.send(parsedMessage);
+                            //let src = parsedMessage.src;
+                        } catch (error) {
+                            console.error('Error parsing MQTT message:', error);
+                            return;
+                        }
                     }
-                  });
+                    else{
+                        console.log("Clients websockets not open");
+                    }
+                });
                   console.log("Data updated");
                 } catch (err) {
                   console.log(err);
                 }
               } else if (payload_src == shelly2) {
                 try {
+
                   let hour =
                     current.getHours() < 10
                       ? `0${current.getHours()}`
@@ -394,50 +379,43 @@ const CreateWebSocketServer = (server, port) => {
                   first_time_running = false;
                   dataRetrieved++;
                   stored_topic = topic;
-
+                  
                   WebSocketServer.clients.forEach(function each(client) {
                     if (client === ws && client.readyState === WebSocket.OPEN) {
-                      let parsedMessage;
-                      try {
-                        //Parse the incoming messages to json format
-                        let payload = {
-                          time_label: `${
-                            current.getHours() < 10
-                              ? `0${current.getHours()}`
-                              : current.getHours()
-                          }:${
-                            current.getMinutes() < 10
-                              ? `0${current.getMinutes()}`
-                              : current.getMinutes()
-                          }`,
-                          payload_src,
-                          switch_status,
-                          power,
-                          voltage,
-                          current_,
-                          aenergy,
-                        };
-                        parsedMessage = JSON.stringify(payload);
-                        client.send(parsedMessage);
-                        //let src = parsedMessage.src;
-                      } catch (error) {
-                        console.error("Error parsing MQTT message:", error);
-                        return;
-                      }
-                    } else {
-                      console.log("Clients websockets not open");
+                        let parsedMessage;
+                        try {
+                            //Parse the incoming messages to json format
+                            let payload = {
+                              time_label:`${current.getHours() < 10? `0${current.getHours()}`: current.getHours()}:${current.getMinutes() < 10? `0${current.getMinutes()}`: current.getMinutes()
+                              }`,
+                              payload_src,
+                              switch_status,
+                              power,
+                              voltage,
+                              current_,
+                              aenergy,
+                            };
+                            parsedMessage = JSON.stringify(payload);
+                            client.send(parsedMessage);
+                            //let src = parsedMessage.src;
+                        } catch (error) {
+                            console.error('Error parsing MQTT message:', error);
+                            return;
+                        }
                     }
-                  });
+                    else{
+                        console.log("Clients websockets not open");
+                    }
+                });
                   console.log("Data updated");
                 } catch (err) {
                   console.log(err);
                 }
               }
             });
-          } 
-          // else if (topic == stored_topic) {
-          //   console.log("");
-          // }
+          } else if (topic == stored_topic) {
+            console.log("Topic", topic, "is stored");
+          }
         }
       }
     });
