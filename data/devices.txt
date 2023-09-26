@@ -1,2 +1,4 @@
-{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"q_12:24_202309-24","applience_brand":"q","applience_variant":"q"}
-{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"q_12:24_202309-24","applience_brand":"q","applience_variant":"q"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"Laundry Machine_17:57_202309-24","applience_brand":"Defy washing machine","applience_variant":"Laundry Machine"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"Main Building geyser_17:57_202309-24","applience_brand":"Geyser (200L)","applience_variant":"Main Building geyser"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"Kitchen stove_17:59_202309-24","applience_brand":"Defy Stove","applience_variant":"Kitchen stove"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"Gadget UPS_17:59_202309-24","applience_brand":"Volcano UPS","applience_variant":"Gadget UPS"}

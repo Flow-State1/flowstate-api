@@ -16,6 +16,7 @@ const figures = require("./router/figuresRouter");
 const userRouter = require("./router/userRouter");
 const consumptions = require('./router/consumptionRouter');
 const payload = require('./router/PayloadRouter');
+const appliences = require('./router/applienceRouter');
 //Create an http server with the express app
 const http = require("http");
 const server = http.createServer(app);
@@ -74,3 +75,4 @@ app.use("/figures", figures);
 app.use('/users', userRouter);
 app.use('/consumptions', consumptions);
 app.use('/payload', payload);
+app.use('/appliences', appliences);
