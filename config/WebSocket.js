@@ -1,14 +1,11 @@
 const WebSocket = require("ws");
 const MQTTClient = require("./MQTTConnection");
 require("dotenv").config();
-const mqtt_message = JSON.stringify(process.env.MESSAGE1);
-const Consumptions = require("../models/consumption");
 const Payloads = require("../models/Payload");
-const Appliences = require("../models/Appliences");
-const { MqttClient } = require("mqtt");
 const fs = require("fs");
 
-const CreateWebSocketServer = (server, port) => {
+
+const CreateWebSocketServer = async (server, port) => {
   const WebSocketServer = new WebSocket.Server({ server });
 
   console.log("Web socket listening on ", port);
@@ -18,62 +15,22 @@ const CreateWebSocketServer = (server, port) => {
     date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
   const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
   let stored_minute = "00";
-  let first_time_running = true;
   stored_minute =
     date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-  let stored_hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
-  let stored_topic = "initial";
-  let applienceid = "";
-  let applienceid1 = "";
-  let applienceid2 = "";
-  let shelly1 = "";
-  let shelly2 = "";
-  let dataRetrieved = 0;
+  let stored_hour =
+    date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+  let topic1 = 0;
+  let topic2 = 0;
+  let devices = [];
+  let count = 0;
 
-  //Check for connection to web socket
-
-  WebSocketServer.on("connection", (ws) => {
+  const onConnection = (ws) => {
     console.log("New Client Connected to Web Socket Server");
 
-    //Send MQTT messages via websocket, whenever the api receives messages from the device
-
     MQTTClient.on("message", async (topic, message) => {
-      console.log("Currently Received Topic:", topic);
-      let current = new Date();
-      let current_minute =
-        current.getMinutes() < 10
-          ? `0${current.getMinutes()}`
-          : current.getMinutes();
-
-      let current_hour =
-        current.getHours() < 10 ? `0${current.getHours()}` : current.getHours();
-
-      // Breakdown the message object and extract what is needed only.
-      let payload_message = JSON.parse(message);
-      let payload_src = payload_message["src"];
-      let payload_params = payload_message["params"];
-      let switch_status = payload_params["output"];
-      let power = payload_params["apower"]*0.001;//This converts currently measure power to Kw/h
-      let voltage = payload_params["voltage"];
-      let current_ = payload_params["current"];
-      let aenergy = payload_params["aenergy"]["total"];
-
-      let payload = {
-        payload_src,
-        switch_status,
-        power,
-        voltage,
-        current_,
-        aenergy,
-      };
-
-      // Compare previously stored hour with currenlty stored hour
-      if (stored_hour != current_hour) {
-        console.log("Stored hour is different from current hour\n");
-
-        //Check if there is a similar payload that laready exist before creating a new one and create a new one otherwise
-
-        function readFileAndProcess(callback) {
+      // This reads from the devices file
+      function readFileAndProcess(callback) {
+        if (fs.existsSync("./data/devices.txt")) {
           fs.readFile("./data/devices.txt", (err, data) => {
             if (err) {
               console.error("Error reading file:", err);
@@ -82,37 +39,79 @@ const CreateWebSocketServer = (server, port) => {
             }
 
             let processed_data = data.toString().trim().split("\n");
-            processed_data.forEach((element) => {
-              let device_object = JSON.parse(element);
-              let shelly_id = device_object.id;
 
-              // Check the source of the stored appliance and compare it with the clientID
-              if (shelly_id == process.env.CLIENTID1) {
-                shelly1 = shelly_id;
-                applienceid1 = device_object.applience_id;
-                // console.log("device_object.applience_id:",device_object.applience_id);
-              } else if (shelly_id == process.env.CLIENTID2) {
-                shelly2 = shelly_id;
-                applienceid2 = device_object.applience_id;
-                // console.log("device_object.applience_id:",device_object.applience_id);
-              }
-            });
+            if (processed_data.length > 0) {
+              processed_data.forEach((element) => {
+                if (element != "" && count != 2) {
+                  let device_object = JSON.parse(element);
+                  devices.push(device_object);
+                  count++;
+                }
+              });
+            } else {
+              console.log("No devices registered");
+            }
 
             callback(null); // Indicate success
           });
+        } else {
+          console.log("File not present, meaning no device is registered");
         }
+      }
 
-        // Call the function and pass a callback
-        readFileAndProcess(async (err) => {
-          if (err) {
-            console.error("Error processing file:", err);
-            return;
-          }
-          if (payload_src == shelly1) {
+      // Call the function and pass a callback
+      readFileAndProcess(async (err) => {
+        if (err) {
+          console.error("Error processing file:", err);
+          return;
+        }
+        //   console.log("Devices file results: ", devices);
+
+        let shelly1 = devices[0];
+        let shelly2 = devices[1];
+        // console.log("Currently Received Topic:", topic);
+        let current = new Date();
+        let current_minute =
+          current.getMinutes() < 10
+            ? `0${current.getMinutes()}`
+            : current.getMinutes();
+
+        let current_hour =
+          current.getHours() < 10
+            ? `0${current.getHours()}`
+            : current.getHours();
+
+        // Breakdown the message object and extract what is needed only.
+        let payload_message = JSON.parse(message);
+        let payload_src = payload_message["src"];
+        let payload_params = payload_message["params"];
+        let switch_status = payload_params["output"];
+        let power = payload_params["apower"] * 0.001; //This converts currently measure power to Kw
+        let voltage = payload_params["voltage"];
+        let current_ = payload_params["current"];
+        let aenergy = payload_params["aenergy"]["total"];
+
+        let payload = {
+          applience_id: "",
+          payload_src,
+          switch_status,
+          power,
+          voltage,
+          current:current_,
+          aenergy,
+        };
+
+        // Compare previously stored hour with currenlty stored hour
+        //   console.log("Devices array length: ",devices.length);
+
+        if (stored_hour != current_hour) {
+          // Create a new payload and register devices to database
+
+          if (payload_src == process.env.CLIENTID1) {
             try {
               const Payload = new Payloads({
                 id: payload_src,
-                applience_id: applienceid1,
+                applience_id: shelly1.applience_id,
                 date: `${year}-${month}-${day}`,
                 hour: `${current.getHours()}:00`,
                 labels_array: [],
@@ -123,301 +122,280 @@ const CreateWebSocketServer = (server, port) => {
                   aenergy: aenergy,
                 },
               });
+              // Check if paylaod to be created already exist
               let results = await Payloads.find({
                 id: payload_src,
-                applience_id: applienceid1,
+                applience_id: shelly1.applience_id,
                 hour: `${current.getHours()}:00`,
               });
-
               if (results.length >= 2) {
                 console.log("Payloads exist");
               } else if (results.length == 0) {
-                console.log("Length at",payload_src,": ",results.length);
                 Payload.save()
                   .then((saved) => {
                     console.log("Payload created");
                   })
                   .catch((err) => {
-                    response.send(err);
+                    console.log(err);
                   });
               }
             } catch (err) {
               console.log(err);
             }
-          } else if (payload_src == shelly2) {
-            try {
-              const Payload = new Payloads({
-                id: payload_src,
-                applience_id: applienceid2,
-                date: `${year}-${month}-${day}`,
-                hour: `${current.getHours()}:00`,
-                labels_array: [],
-                data: {
-                  apower: power,
-                  voltage: voltage,
-                  current: current_,
-                  aenergy: aenergy,
-                },
-              });
-              let results = await Payloads.find({
-                id: payload_src,
-                applience_id: applienceid2,
-                hour: `${current.getHours()}:00`,
-              });
-              // console.log("results at",payload_src,", ",applienceid2,", ",`${current.getHours()}:00`," ",results);
-              if (results.length >= 2) {
-                console.log("Payloads exist");
-              } else if (results.length == 0) {
-                console.log("Length at",payload_src,": ",results.length);
-                Payload.save()
-                  .then((saved) => {
-                    stored_hour = current_hour;
-                    console.log("Payload created and hour changed");
-                  })
-                  .catch((err) => {
-                    response.send(err);
-                  });
-              }
-
-            } catch (err) {
-              console.log(err);
+          } else if (payload_src == process.env.CLIENTID2) {
+            const Payload = new Payloads({
+              id: payload_src,
+              applience_id: shelly2.applience_id,
+              date: `${year}-${month}-${day}`,
+              hour: `${current.getHours()}:00`,
+              labels_array: [],
+              data: {
+                apower: power,
+                voltage: voltage,
+                current: current_,
+                aenergy: aenergy,
+              },
+            });
+            //   Check if there is payload with defined info for creating new one
+            let results = await Payloads.find({
+              id: payload_src,
+              applience_id: shelly2.applience_id,
+              hour: `${current.getHours()}:00`,
+            });
+            if (results.length >= 2) {
+              console.log("Payloads exist");
+            } else if (results.length == 0) {
+              Payload.save()
+                .then((saved) => {
+                  stored_hour = current_hour;
+                  console.log("Payload created and hour changed");
+                })
+                .catch((err) => {
+                  response.send(err);
+                });
             }
           }
-        });
+        } else {
+          if (stored_minute != current_minute) {
+            // console.log("Stored Minute: ",stored_minute);
+            // console.log("Current minute: ",current_minute,"\n");
+            stored_minute = current_minute;
+            topic1 = 0;
+            topic2 = 0;
+          } else {
+            // console.log("Stored Minute: ",stored_minute);
+            // console.log("Current minute: ",current_minute,"\n");
+            if (payload_src == process.env.CLIENTID1 && topic1 == 0) {
+              // Update appropriate Payload
+              payload.applience_id = shelly1.applience_id;
+              topic1 = 1;
+              console.log(
+                "Payload 1 at ",
+                `${current_hour}:${current_minute}`,
+                "",
+                payload
+              );
+              try {
+                let hour =
+                  current.getHours() < 10
+                    ? `0${current.getHours()}`
+                    : current.getHours() + ":00";
+                const result = await Payloads.findOne({
+                  id: payload_src,
+                  applience_id: payload.applience_id,
+                  hour: hour,
+                });
+                console.log(
+                  "Results for:",
+                  payload_src,
+                  " and ",
+                  payload.applience_id,
+                  "at",
+                  hour,
+                  " ",
+                  result
+                );
 
-        // Logic to create a new payload and store data received when this payload was created
+                let labels = result.labels_array;
+                console.log("Array from DB before update: ", labels);
+                let dataArray = result.data;
+                labels.push(
+                  `${
+                    current.getHours() < 10
+                      ? `0${current.getHours()}`
+                      : current.getHours()
+                  }:${
+                    current.getMinutes() < 10
+                      ? `0${current.getMinutes()}`
+                      : current.getMinutes()
+                  }`
+                );
+                console.log("Array to be sent to db: ", labels);
+                let data = {
+                  apower: power,
+                  voltage,
+                  current:current_,
+                  aenergy,
+                };
+                dataArray.push(data);
+                // console.log(labels);
 
-        // Read from file and and get the applience_ID and append it to the payload
-      } else if (stored_hour == current_hour) {
-        console.log("Stored hour is similar to current hour\n");
+                await Payloads.updateOne(
+                  {
+                    id: payload_src,
+                    applience_id: payload.applience_id,
+                    hour: hour,
+                  },
+                  {
+                    labels_array: labels,
+                    data: dataArray,
+                  }
+                );
+                const UpdatedPayload = await Payloads.findOne({
+                  id: payload_src,
+                  applience_id: payload.applience_id,
+                  hour: hour,
+                });
 
-        // Check if we are still in the same inute as the previously recorded one or not
-        if (stored_minute != current_minute) {
-          first_time_running = true;
-          console.log("Stored minute is not similar to current minute\n");
-          stored_minute =
-            current.getMinutes() < 10
-              ? `0${current.getMinutes()}`
-              : current.getMinutes();
-          dataRetrieved = 0;
-        }
+                WebSocketServer.clients.forEach(function each(client) {
+                  if (client === ws && client.readyState === WebSocket.OPEN) {
+                    // console.log(
+                    //   "Uprocessed Updated Data: ",
+                    //   UpdatedPayload["data"]
+                    // );
 
-        //
-        else if (stored_minute == current_minute) {
-          console.log("Stored minute is similar to current minute");
-          // If the current topic is not similar to the previous topic and if first time running is true, update data in the database and set first time running to false
-          if (topic != stored_topic && dataRetrieved != 2) {
-            console.log("Topic", stored_topic, "not recorded stored");
-
-            function readFileAndProcess(callback) {
-              fs.readFile("./data/devices.txt", (err, data) => {
-                if (err) {
-                  console.error("Error reading file:", err);
-                  callback(err);
-                  return;
-                }
-
-                let processed_data = data.toString().trim().split("\n");
-                processed_data.forEach((element) => {
-                  let device_object = JSON.parse(element);
-                  let shelly_id = device_object.id;
-
-                  // Check the source of the stored appliance and compare it with the clientID
-                  if (shelly_id == process.env.CLIENTID1) {
-                    shelly1 = shelly_id;
-                    applienceid1 = device_object.applience_id;
-                    // console.log("device_object.applience_id:",device_object.applience_id);
-                  } else if (shelly_id == process.env.CLIENTID2) {
-                    shelly2 = shelly_id;
-                    applienceid2 = device_object.applience_id;
-                    // console.log("device_object.applience_id:",device_object.applience_id);
+                    let json = {
+                      payload_src,
+                      labels_array: UpdatedPayload["labels_array"],
+                      data: UpdatedPayload["data"],
+                    };
+                    const resultPayload = JSON.stringify(json);
+                    // console.log("Updated Data: ", resultPayload);
+                    try {
+                      //Parse the incoming messages to json format
+                      //   parsedMessage = JSON.stringify(UpdatedPayload);
+                      console.log("Sending data for: ", payload_src);
+                      client.send(resultPayload);
+                      //let src = parsedMessage.src;
+                    } catch (error) {
+                      console.error("Error parsing MQTT message:", error);
+                      return;
+                    }
+                  } else {
+                    console.log("Clients websockets not open");
                   }
                 });
+                // console.log("Data updated");
+              } catch (err) {
+                console.log(err);
+              }
+            } else if (payload_src == process.env.CLIENTID2 && topic2 == 0) {
+              // Update appropriate payload
+              payload.applience_id = shelly2.applience_id;
+              topic2 = 1;
+              console.log(
+                "Payload 2  at ",
+                `${current_hour}:${current_minute}`,
+                "",
+                payload
+              );
+              try {
+                let hour =
+                  current.getHours() < 10
+                    ? `0${current.getHours()}`
+                    : current.getHours() + ":00";
+                const result = await Payloads.findOne({
+                  id: payload_src,
+                  applience_id: payload.applience_id,
+                  hour: hour,
+                });
+                console.log(
+                  "Results for:",
+                  payload_src,
+                  " and ",
+                  payload.applience_id,
+                  "at",
+                  hour,
+                  " ",
+                  result
+                );
 
-                callback(null); // Indicate success
-              });
+                let labels = result.labels_array;
+                let dataArray = result.data;
+                labels.push(
+                  `${
+                    current.getHours() < 10
+                      ? `0${current.getHours()}`
+                      : current.getHours()
+                  }:${
+                    current.getMinutes() < 10
+                      ? `0${current.getMinutes()}`
+                      : current.getMinutes()
+                  }`
+                );
+
+                let data = {
+                  apower: power,
+                  voltage,
+                  current:current_,
+                  aenergy,
+                };
+                dataArray.push(data);
+                // console.log(labels);
+
+                await Payloads.updateOne(
+                  {
+                    id: payload_src,
+                    applience_id: payload.applience_id,
+                    hour: hour,
+                  },
+                  {
+                    labels_array: labels,
+                    data: dataArray,
+                  }
+                );
+                const UpdatedPayload = await Payloads.findOne({
+                  id: payload_src,
+                  applience_id: payload.applience_id,
+                  hour: hour,
+                });
+                // console.log("Updated Data: ",resultPayload[]);
+                WebSocketServer.clients.forEach(function each(client) {
+                  if (client === ws && client.readyState === WebSocket.OPEN) {
+                    // console.log(
+                    //   "Uprocessed Updated Data: ",
+                    //   UpdatedPayload
+                    // );
+
+                    let json = {
+                      payload_src,
+                      labels_array: UpdatedPayload["labels_array"],
+                      data: UpdatedPayload["data"],
+                    };
+                    const resultPayload = JSON.stringify(json);
+                    // console.log("Updated Data: ", resultPayload);
+                    try {
+                      //Parse the incoming messages to json format
+                      //   parsedMessage = JSON.stringify(UpdatedPayload);
+                      console.log("Sending data for: ", payload_src);
+                      client.send(resultPayload);
+                      //let src = parsedMessage.src;
+                    } catch (error) {
+                      console.error("Error parsing MQTT message:", error);
+                      return;
+                    }
+                  } else {
+                    console.log("Clients websockets not open");
+                  }
+                });
+                // console.log("Data updated");
+              } catch (err) {
+                console.log(err);
+              }
             }
-
-            // Call the function and pass a callback
-            readFileAndProcess(async (err) => {
-              if (err) {
-                console.error("Error processing file:", err);
-                return;
-              }
-              if (payload_src == shelly1) {
-                try {
-                  let hour =
-                    current.getHours() < 10
-                      ? `0${current.getHours()}`
-                      : current.getHours() + ":00";
-                  const result = await Payloads.findOne({
-                    id: payload_src,
-                    applience_id: applienceid1,
-                    hour: hour,
-                  });
-                  console.log(
-                    "Results for:",
-                    payload_src,
-                    " and ",
-                    applienceid1,
-                    "at",
-                    hour,
-                    " ",
-                    result
-                  );
-
-                  let labels = result.labels_array;
-                  console.log(labels);
-                  let dataArray = result.data;
-                  labels.push(
-                    `${
-                      current.getHours() < 10
-                        ? `0${current.getHours()}`
-                        : current.getHours()
-                    }:${
-                      current.getMinutes() < 10
-                        ? `0${current.getMinutes()}`
-                        : current.getMinutes()
-                    }`
-                  );
-
-                  let data = {
-                    apower: 0,
-                    voltage,
-                    current,
-                    aenergy,
-                  };
-                  dataArray.push(data);
-                  console.log(labels);
-
-                  await Payloads.updateOne(
-                    { applience_id: applienceid },
-                    {
-                      labels_array: labels,
-                      data: dataArray,
-                    }
-                  );
-                  
-                  first_time_running = false;
-                  dataRetrieved++;
-                  stored_topic = topic;
-                  WebSocketServer.clients.forEach(function each(client) {
-                    if (client === ws && client.readyState === WebSocket.OPEN) {
-                        let parsedMessage;
-                        try {
-                            //Parse the incoming messages to json format
-                            parsedMessage = JSON.stringify(payload);
-                            client.send(parsedMessage);
-                            //let src = parsedMessage.src;
-                        } catch (error) {
-                            console.error('Error parsing MQTT message:', error);
-                            return;
-                        }
-                    }
-                    else{
-                        console.log("Clients websockets not open");
-                    }
-                });
-                  console.log("Data updated");
-                } catch (err) {
-                  console.log(err);
-                }
-              } else if (payload_src == shelly2) {
-                try {
-
-                  let hour =
-                    current.getHours() < 10
-                      ? `0${current.getHours()}`
-                      : current.getHours() + ":00";
-                  const result = await Payloads.findOne({
-                    id: payload_src,
-                    applience_id: applienceid2,
-                    hour: hour,
-                  });
-                  console.log(
-                    "Results for:",
-                    payload_src,
-                    " and ",
-                    applienceid2,
-                    "at",
-                    hour,
-                    " ",
-                    result
-                  );
-
-                  let labels = result.labels_array;
-                  console.log(labels);
-                  let dataArray = result.data;
-                  labels.push(
-                    `${
-                      current.getHours() < 10
-                        ? `0${current.getHours()}`
-                        : current.getHours()
-                    }:${
-                      current.getMinutes() < 10
-                        ? `0${current.getMinutes()}`
-                        : current.getMinutes()
-                    }`
-                  );
-
-                  let data = {
-                    apower: 0,
-                    voltage,
-                    current,
-                    aenergy,
-                  };
-                  dataArray.push(data);
-                  console.log(labels);
-
-                  await Payloads.updateOne(
-                    { applience_id: applienceid },
-                    {
-                      labels_array: labels,
-                      data: dataArray,
-                    }
-                  );
-                  first_time_running = false;
-                  dataRetrieved++;
-                  stored_topic = topic;
-                  
-                  WebSocketServer.clients.forEach(function each(client) {
-                    if (client === ws && client.readyState === WebSocket.OPEN) {
-                        let parsedMessage;
-                        try {
-                            //Parse the incoming messages to json format
-                            let payload = {
-                              time_label:`${current.getHours() < 10? `0${current.getHours()}`: current.getHours()}:${current.getMinutes() < 10? `0${current.getMinutes()}`: current.getMinutes()
-                              }`,
-                              payload_src,
-                              switch_status,
-                              power,
-                              voltage,
-                              current_,
-                              aenergy,
-                            };
-                            parsedMessage = JSON.stringify(payload);
-                            client.send(parsedMessage);
-                            //let src = parsedMessage.src;
-                        } catch (error) {
-                            console.error('Error parsing MQTT message:', error);
-                            return;
-                        }
-                    }
-                    else{
-                        console.log("Clients websockets not open");
-                    }
-                });
-                  console.log("Data updated");
-                } catch (err) {
-                  console.log(err);
-                }
-              }
-            });
-          } else if (topic == stored_topic) {
-            console.log("Topic", topic, "is stored");
           }
         }
-      }
+      });
     });
 
     //Add the websocket server as a subscriver to the topics of both devices
@@ -425,10 +403,17 @@ const CreateWebSocketServer = (server, port) => {
     MQTTClient.subscribe(process.env.SWITCH_SUBSCRIBERTOPIC2.toString());
     MQTTClient.subscribe("test");
     MQTTClient.subscribe("test2");
-  });
+
+    ws.onclose = (event) => {
+      console.log("Client closed connection to socket");
+    };
+  };
+
+  WebSocketServer.on("connection", onConnection);
 
   WebSocketServer.on("close", (ws) => {
     console.log("client disconnected");
+    // clients.delete(ws)
   });
 };
 

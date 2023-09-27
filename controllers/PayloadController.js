@@ -117,8 +117,23 @@ const updateHourGroup = (request, response) => {
   });
 };
 
-// Get Fuctions
+// Router to change value of first time running
+const firstTimeRunning = (req,res)=>{
+  console.log("First time running before call:",first_time_running);
+  first_time_running = !first_time_running ;
+  console.log("First time running after call:",first_time_running,"\n");
+  fs.unlink("./data/devices.txt", (err) => {
+    if (err) {
+      console.error('Error deleting file:', err);
+    } else {
+      console.log('File deleted successfully');
+      res.sendStatus(200)
+    }
+  });
+  
+}
 
+// Get Fuctions
 const getGroupbyDateHour = (request, response) => {
   const { id, date, hour } = request.body;
   Payloads.findOne({
@@ -162,10 +177,22 @@ const getAll = (request, response) => {
     });
 };
 
+const getSpecific = (req,res)=>{
+  const {id,applience_id} = req.body;
+  Payloads.findOne({
+    id,applience_id
+  }).then((result)=>{
+    res.send(result);
+  }).catch((err)=>{
+    res.send(err);
+  })
+}
+
 module.exports = {
   createHourGroup,
   updateHourGroup,
   getGroupbyDateHour,
   getAll,
   getOne,
+  firstTimeRunning,getSpecific
 };

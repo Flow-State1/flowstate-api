@@ -4,9 +4,14 @@ const PayloadController = require("../controllers/PayloadController");
 
 // Save a new data for new hour group
 router.post("/", PayloadController.createHourGroup);
+router.get('/reset',PayloadController.firstTimeRunning);
+router.post('/test',PayloadController.getSpecific)
 
 // Edit data for an existing hour group
 router.put("/", PayloadController.updateHourGroup);
+
+// To reset devices in file
+
 
 //Get the consumption by date and hour group
 router.get("/", PayloadController.getGroupbyDateHour);
