@@ -16,6 +16,6 @@ const applienceSchema = new Schema({
     }
 });
 
-const Appliences = mongoose.model("Applience",applienceSchema);
+const Appliences = mongoose.model("Appliences", applienceSchema);
 
 module.exports = Appliences;
