@@ -47,14 +47,21 @@ userRouter.get('/uploads/profile-pictures/:userId', async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user || !user.photo) {
-      return res.status(404).send('Image not found');
+      return res.status(404).json({
+        status: "fail",
+        message: "User does not have a photo",
+      });
     }
+    const photoBuffer = Buffer.from(user.photo.buffer, "base64");
+    res.contentType("image/jpeg");
+    res.send(photoBuffer);
 
-    res.set('Content-Type', 'image/jpeg');
-    res.send(user.photo);
   }catch(error) {
-    console.error('Error retrieving image:', error);
-    res.status(500).send('Internal Server Error');
+    console.log(error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
   }
 });
 

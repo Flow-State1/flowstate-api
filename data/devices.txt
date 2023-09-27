@@ -1,4 +1,10 @@
-{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"Laundry Machine_17:57_202309-24","applience_brand":"Defy washing machine","applience_variant":"Laundry Machine"}
-{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"Main Building geyser_17:57_202309-24","applience_brand":"Geyser (200L)","applience_variant":"Main Building geyser"}
-{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"Kitchen stove_17:59_202309-24","applience_brand":"Defy Stove","applience_variant":"Kitchen stove"}
-{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"Gadget UPS_17:59_202309-24","applience_brand":"Volcano UPS","applience_variant":"Gadget UPS"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"AppleTv_21:31_202309-27","applience_brand":"Apple","applience_variant":"AppleTv"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"Laptop_21:31_202309-27","applience_brand":"Asus","applience_variant":"Laptop"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"cams_21:41_202309-27","applience_brand":"Polariod","applience_variant":"cams"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"speaker_21:41_202309-27","applience_brand":"volkano","applience_variant":"speaker"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"myWorkMontior_21:50_202309-27","applience_brand":"Lenovo","applience_variant":"myWorkMontior"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"myWorkPC_21:50_202309-27","applience_brand":"Dell","applience_variant":"myWorkPC"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"fridge_21:59_202309-27","applience_brand":"Defy","applience_variant":"fridge"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"washingmachine_21:59_202309-27","applience_brand":"Defy","applience_variant":"washingmachine"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","applience_id":"myWorkMontior_22:06_202309-27","applience_brand":"Dell","applience_variant":"myWorkMontior"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","applience_id":"AppleTv_22:06_202309-27","applience_brand":"Apple","applience_variant":"AppleTv"}
