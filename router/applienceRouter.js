@@ -1,28 +1,7 @@
 const router = require("express").Router();
-const Appliences = require('../models/Appliences');
+const appliencesController = require('../controllers/appliencesController');
+const authController = require('../controllers/authController');
 
-router.get('/appliences', async (req, res) => {
-    try {
-        const appliences = await Appliences.find();
-
-        if (appliences.length === 0) {
-            return res.status(404).json({
-              status: 'fail',
-              message: 'No appliances found',
-            });
-        }
-      
-        res.status(200).json({
-            status: 'success',
-            appliances: appliences,
-        });
-        
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({ 
-            message: 'Internal server error' 
-        });
-    }
-});
+router.get('/appliences', appliencesController.getAllAppliences);
 
 module.exports = router;
