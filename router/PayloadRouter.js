@@ -4,6 +4,7 @@ const PayloadController = require("../controllers/PayloadController");
 
 // Save a new data for new hour group
 router.post("/", PayloadController.createHourGroup);
+router.post("/2", PayloadController.createPayloadOnly);
 router.get('/reset',PayloadController.firstTimeRunning);
 router.post('/test',PayloadController.getSpecific)
 

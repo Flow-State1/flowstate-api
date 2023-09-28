@@ -1,2 +1,0 @@
-{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"Alienware_15:41_202309-28","applience_brand":"Dell","applience_variant":"Alienware"}
-{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"Envy_15:41_202309-28","applience_brand":"Hp","applience_variant":"Envy"}
