@@ -4,7 +4,6 @@ require("dotenv").config();
 const Payloads = require("../models/Payload");
 const fs = require("fs");
 
-
 const CreateWebSocketServer = async (server, port) => {
   const WebSocketServer = new WebSocket.Server({ server });
 
@@ -97,7 +96,7 @@ const CreateWebSocketServer = async (server, port) => {
           switch_status,
           power,
           voltage,
-          current:current_,
+          current: current_,
           aenergy,
         };
 
@@ -234,7 +233,7 @@ const CreateWebSocketServer = async (server, port) => {
                 let data = {
                   apower: power,
                   voltage,
-                  current:current_,
+                  current: current_,
                   aenergy,
                 };
                 dataArray.push(data);
@@ -337,7 +336,7 @@ const CreateWebSocketServer = async (server, port) => {
                 let data = {
                   apower: power,
                   voltage,
-                  current:current_,
+                  current: current_,
                   aenergy,
                 };
                 dataArray.push(data);
