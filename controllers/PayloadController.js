@@ -82,6 +82,7 @@ const createHourGroup = (request, response) => {
 
     // Check if applience with fiven brand and variant exist if it does then dont create a new applience documentm, just save the payload only with the existing applience's id
     let results = await Appliences.findOne({
+      user_id,
       applience_brand,
       applience_variant,
     });
@@ -109,7 +110,7 @@ const createHourGroup = (request, response) => {
 
           Payload.save()
             .then((saved) => {
-              // console.log("Saved payload: ", saved);
+              console.log("Saved payload: ", saved);
               response.status(200).send(saved);
             })
             .catch((err) => {
@@ -120,7 +121,7 @@ const createHourGroup = (request, response) => {
           response.send(err);
         });
     } else if (results !== 0) {
-      // console.log("Applience document exist, creating payload only");
+      console.log("Applience document exist, creating payload only");
       const Payload = new Payloads({
         id,
         user_id,
@@ -133,7 +134,7 @@ const createHourGroup = (request, response) => {
 
       Payload.save()
         .then((saved) => {
-          // console.log("Saved payload: ", saved);
+          console.log("Saved payload: ", saved);
           response.status(200).send(saved);
         })
         .catch((err) => {
@@ -278,7 +279,7 @@ const updateHourGroup = (request, response) => {
 // Router to change value of first time running
 const firstTimeRunning = (req, res) => {
   console.log("First time running before call:", first_time_running);
-  first_time_running = !first_time_running;
+  first_time_running = true;
   console.log("First time running after call:", first_time_running, "\n");
   fs.unlink("./data/devices.txt", (err) => {
     if (err) {

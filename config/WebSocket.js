@@ -132,6 +132,7 @@ const CreateWebSocketServer = async (server, port) => {
           // Compare previously stored hour with currenlty stored hour
           //   console.log("Devices array length: ",devices.length);
 
+          // Check the switch status and the power and if switch is on and no device is plugged in, send an alert, we can store previous power and previous current, and just use them to check
           if (stored_hour != current_hour) {
             // Create a new payload and register devices to database
 
