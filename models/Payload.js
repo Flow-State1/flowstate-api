@@ -7,6 +7,10 @@ const payloadSchema = new Schema({
     type: String,
     required: true,
   },
+  user_id: {
+    type: String,
+    required: true,
+  },
   applience_id: {
     type: String,
     required: true,

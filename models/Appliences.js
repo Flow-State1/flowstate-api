@@ -6,6 +6,10 @@ const applienceSchema = new Schema({
         type:String,
         required:true,
     },
+    user_id:{
+        type:String,
+        required:true
+    },
     applience_brand:{
         type:String,
         required:true

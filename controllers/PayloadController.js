@@ -5,78 +5,109 @@ const fs = require("fs");
 let first_time_running = true;
 // Post Functions
 const createHourGroup = (request, response) => {
-  let labelArray = [];
-  const date = new Date();
+  let user_id="";
+  console.log("Hour group is being created");
+  function readUserFileAndProcess(callback) {
+    if (fs.existsSync("./data/user.txt")) {
+      fs.readFile("./data/user.txt", (err, data) => {
+        if (err) {
+          console.error("Error reading file:", err);
+          callback(err);
+          return;
+        }
 
-  const year = date.getFullYear();
-  const month =
-    date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
-  const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-  const hour = `${date.getHours()}:00`;
-  const minutes =
-    date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-  const time = `${date.getHours()}:${minutes}`;
-  labelArray.push(`${date.getHours()}:${minutes}`);
+        user_id = data.toString().trim();
+        console.log("User with id: ", user_id);
 
-  const { id, data, applience_brand, applience_variant, device } = request.body;
-  const applience_id = `${applience_variant}_${date.getHours()}:${
-    date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
-  }_${year}${month}-${day}`;
-
-  const deviceObject = {
-    device,
-    id,
-    applience_id,
-    applience_brand,
-    applience_variant,
-  };
-
-  const dataObject = JSON.stringify(deviceObject);
-  console.log("First time running: ", first_time_running);
-  // Must check if its the first time this is running and if it is you want to overwrite the file, else you want to append to the file
-  if (!first_time_running) {
-    fs.appendFile("./data/devices.txt", dataObject + "\n", (err) => {
-      if (err) {
-        console.error("Error writing to file:", err);
-      }
-    });
-  } else if (first_time_running) {
-    first_time_running = false
-    fs.writeFile("./data/devices.txt", dataObject + "\n", (err) => {
-      if (err) {
-        console.error("Error writing to file:", err);
-      }
-    });
-  }
-
-  const Applience = new Appliences({
-    applience_id,
-    applience_brand,
-    applience_variant,
-  });
-  Applience.save()
-    .then((saved) => {
-      const Payload = new Payloads({
-        id,
-        applience_id,
-        date: `${year}-${month}-${day}`,
-        hour: `${date.getHours()}:00`,
-        labels_array: labelArray,
-        data,
+        callback(null); // Indicate success
       });
-
-      Payload.save()
-        .then((saved) => {
-          console.log("Saved");
-          response.status(200).send(saved);
-        })
-        .catch((err) => {
-          response.send(err);
-        });
-    })
-    .catch((err) => {
-      response.send(err);
+    } else {
+      console.log("File not present, meaning no user, logged in");
+    }
+  }
+  readUserFileAndProcess(async (err) => {
+    if (err) {
+      console.error("Error processing file:", err);
+      return;
+    }
+    let labelArray = [];
+    const date = new Date();
+  
+    const year = date.getFullYear();
+    const month =
+      date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+    const hour = `${date.getHours()}:00`;
+    const minutes =
+      date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+    const time = `${date.getHours()}:${minutes}`;
+    labelArray.push(`${date.getHours()}:${minutes}`);
+  
+    const { id, data, applience_brand, applience_variant, device } = request.body;
+    const applience_id = `${applience_variant}_${date.getHours()}:${
+      date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
+    }_${year}${month}-${day}`;
+  
+    const deviceObject = {
+      device,
+      id,
+      user_id,
+      applience_id,
+      applience_brand,
+      applience_variant,
+    };
+  
+    const dataObject = JSON.stringify(deviceObject);
+    // console.log("First time running: ", first_time_running);
+    // Must check if its the first time this is running and if it is you want to overwrite the file, else you want to append to the file
+    if (!first_time_running) {
+      fs.appendFile("./data/devices.txt", dataObject + "\n", (err) => {
+        if (err) {
+          console.error("Error writing to file:", err);
+        }
+      });
+    } else if (first_time_running) {
+      first_time_running = false
+      fs.writeFile("./data/devices.txt", dataObject + "\n", (err) => {
+        if (err) {
+          console.error("Error writing to file:", err);
+        }
+      });
+    }
+  
+    const Applience = new Appliences({
+      applience_id,
+      user_id,
+      applience_brand,
+      applience_variant,
     });
+    Applience.save()
+      .then((saved) => {
+        console.log("Saved applience: ",saved);
+        const Payload = new Payloads({
+          id,
+          user_id,
+          applience_id,
+          date: `${year}-${month}-${day}`,
+          hour: `${date.getHours()}:00`,
+          labels_array: labelArray,
+          data,
+        });
+  
+        Payload.save()
+          .then((saved) => {
+            console.log("Saved payload: ",saved);
+            response.status(200).send(saved);
+          })
+          .catch((err) => {
+            response.send(err);
+          });
+      })
+      .catch((err) => {
+        response.send(err);
+      });
+  })
+
 };
 
 // Put Functions
@@ -95,6 +126,7 @@ const updateHourGroup = (request, response) => {
   const { data, applience_id } = request.body;
   //To save in an existing collection
   Payloads.findOne({
+    user_id,
     applience_id,
   }).then((result) => {
     let labels = result.labels_array;
@@ -105,6 +137,7 @@ const updateHourGroup = (request, response) => {
     console.log(labels);
     Payloads.updateOne(
       {
+        user_id,
         applience_id,
       },
       {
@@ -138,6 +171,7 @@ const getGroupbyDateHour = (request, response) => {
   const { id, date, hour } = request.body;
   Payloads.findOne({
     id,
+    user_id,
     date,
     hour,
   })
@@ -156,6 +190,7 @@ const getOne = (request, response) => {
 
   //To save in an existing collection
   Payloads.findOne({
+    user_id,
     applience_id,
   })
     .then((result) => {

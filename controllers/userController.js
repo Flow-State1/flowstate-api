@@ -1,4 +1,5 @@
 const User = require('./../models/user');
+const fs = require('fs')
 
 //Function filters the object and takes in an array of allowed fileds
 const filterObj = (obj, ...allowedFields) => {
@@ -104,6 +105,29 @@ const deleteUser = (async (req, res) => {
   
 });
 
+
+// const getUser =(req,res)=>{
+//   const id = req.params.id;
+//   User.findOne({
+//     _id:`${id}`
+//   }).then((results)=>{
+//     res.send(results)
+//   }).catch((err)=>{
+//     res.send(err)
+//   })
+// }
+
+// Create a controller to create a user session file, with the user id in the file
+const userSession = (req,res)=>{
+  const id = req.params.id;
+  fs.writeFile("./data/user.txt", id , (err) => {
+    if (err) {
+      console.error("Error writing to file:", err);
+    }
+  })
+  res.sendStatus(200)
+}
+
 module.exports = {
   getAllUsers,
   updateMe,
@@ -111,5 +135,6 @@ module.exports = {
   createUser, 
   updateUser, 
   deleteUser,
-  deleteMe
+  deleteMe,
+  userSession
 }
