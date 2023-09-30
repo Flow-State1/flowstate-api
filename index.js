@@ -27,7 +27,7 @@ const WebSocketServer = require("./config/WebSocket");
 app.use(helmet());
 
 // Serve static files from the 'public' directory
-app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
 
 //Testing the server with Postman
 app.get('/', (req, res) => {
