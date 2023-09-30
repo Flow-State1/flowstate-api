@@ -6,6 +6,7 @@ let first_time_running = true;
 // Post Functions
 const createHourGroup = (request, response) => {
   let user_id = "";
+
   console.log("Hour group is being created");
   function readUserFileAndProcess(callback) {
     if (fs.existsSync("./data/user.txt")) {
@@ -60,10 +61,10 @@ const createHourGroup = (request, response) => {
       applience_variant,
     };
 
-    console.log("Device Object: ",deviceObject);
+    console.log("Device Object: ", deviceObject);
 
     const dataObject = JSON.stringify(deviceObject);
-    // console.log("First time running: ", first_time_running);
+    console.log("First time running: ", first_time_running);
     // Must check if its the first time this is running and if it is you want to overwrite the file, else you want to append to the file
     if (!first_time_running) {
       fs.appendFile("./data/devices.txt", dataObject + "\n", (err) => {
@@ -88,16 +89,18 @@ const createHourGroup = (request, response) => {
     });
     // console.log("Results for searching if appliences exist: ", results);
     if (results == 0 || results == null) {
+      console.log("user_id",user_id);
       const Applience = new Appliences({
         applience_id,
-        user_id,
+        user_id:user_id,
         applience_brand,
         applience_variant,
       });
       console.log("No devices registered");
+      console.log("User to regtister: ", user_id);
       Applience.save()
         .then((saved) => {
-          // console.log("Saved applience: ", saved);
+          console.log("Saved applience: ", saved);
           const Payload = new Payloads({
             id,
             user_id,
@@ -118,9 +121,11 @@ const createHourGroup = (request, response) => {
             });
         })
         .catch((err) => {
+          console.log(err);
           response.send(err);
         });
     } else if (results !== 0) {
+      console.log("user_id,",user_id);
       console.log("Applience document exist, creating payload only");
       const Payload = new Payloads({
         id,
@@ -199,7 +204,7 @@ const createPayloadOnly = (request, response) => {
     };
 
     const dataObject = JSON.stringify(deviceObject);
-    // console.log("First time running: ", first_time_running);
+    console.log("First time running: ", first_time_running);
     // Must check if its the first time this is running and if it is you want to overwrite the file, else you want to append to the file
     if (!first_time_running) {
       fs.appendFile("./data/devices.txt", dataObject + "\n", (err) => {
