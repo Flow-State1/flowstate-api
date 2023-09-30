@@ -1,0 +1,2 @@
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"6515ad3c43cbe33f7032da46","applience_id":"S_19:18_202309-28","applience_brand":"Q","applience_variant":"S"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"6515ad3c43cbe33f7032da46","applience_id":"C_19:18_202309-28","applience_brand":"D","applience_variant":"C"}
