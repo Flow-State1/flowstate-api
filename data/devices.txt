@@ -1,2 +1,4 @@
-{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"Laptop 15_15:49_202309-30","applience_brand":"HP","applience_variant":"Laptop 15"}
-{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"myWorkMontior_15:49_202309-30","applience_brand":"Dell","applience_variant":"myWorkMontior"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"S2721HN_15:56_202309-30","applience_brand":"Dell","applience_variant":"S2721HN"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"QLED28_15:56_202309-30","applience_brand":"Samsung","applience_variant":"QLED28"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"S2721HN_15:56_202309-30","applience_brand":"Dell","applience_variant":"S2721HN"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"QLED28_15:56_202309-30","applience_brand":"Samsung","applience_variant":"QLED28"}
