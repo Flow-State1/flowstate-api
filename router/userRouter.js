@@ -70,7 +70,6 @@ userRouter.post('/signup', authController.signup);
 userRouter.post('/login', authController.login);
 userRouter.get('/logout', authController.logout);
 
-
 //Endpoint relevant for password resetting operations
 userRouter.post('/forgotPassword', authController.forgotPassword);
 userRouter.patch('/resetPassword/:token', authController.resetPassword);
@@ -97,8 +96,5 @@ userRouter
   .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(authController.protect, userController.deleteUser);
-
-// Route to create a file with user ID
-userRouter.post('/:id',userController.userSession);
 
 module.exports = userRouter;
