@@ -1,2 +1,6 @@
-{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"6515ad3c43cbe33f7032da46","applience_id":"S_19:18_202309-28","applience_brand":"Q","applience_variant":"S"}
-{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"6515ad3c43cbe33f7032da46","applience_id":"C_19:18_202309-28","applience_brand":"D","applience_variant":"C"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"6515ad3c43cbe33f7032da46","applience_id":"Alienware_14:35_202309-30","applience_brand":"Dell","applience_variant":"Alienware"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"6515ad3c43cbe33f7032da46","applience_id":"Ideapad 14_14:35_202309-30","applience_brand":"Lenovo","applience_variant":"Ideapad 14"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"6515ad3c43cbe33f7032da46","applience_id":"homeFridge_14:37_202309-30","applience_brand":"KCC","applience_variant":"homeFridge"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"6515ad3c43cbe33f7032da46","applience_id":"DishWasher_14:37_202309-30","applience_brand":"Defy","applience_variant":"DishWasher"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"6515ad3c43cbe33f7032da46","applience_id":"DishWasher_14:37_202309-30","applience_brand":"Defy","applience_variant":"DishWasher"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"6515ad3c43cbe33f7032da46","applience_id":"homeFridge_14:37_202309-30","applience_brand":"KCC","applience_variant":"homeFridge"}
