@@ -19,5 +19,9 @@ router.get("/", PayloadController.getGroupbyDateHour);
 router.get("/1",PayloadController.getOne)
 
 router.get("/all",PayloadController.getAll);
+router.get("/thirty", PayloadController.getThirtyDays);
+router.get("/seven", PayloadController.getSevenDays);
+router.get("/yesterday", PayloadController.getYesterday);
+router.get("/today", PayloadController.getToday);
 
 module.exports = router;

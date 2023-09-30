@@ -356,6 +356,78 @@ const getSpecific = (req, res) => {
     });
 };
 
+//Getting data generated in the last 30 days
+const getThirtyDays = (request, response) => {
+  // Current date
+const currentDate = new Date();
+
+const thirtyDays = currentDate.setDate(currentDate.getDate() - 30);
+
+  Payloads.find({ date: { $gte: thirtyDays, $lte: currentDate } })
+    .then((results) => {
+      response.send(results);
+    })
+    .catch((errors) => {
+      response.send(
+        `Id:Error Fetching payload by date and hour group,message:${errors}`
+      );
+    });
+};
+
+//Getting data generated in the last 7 days
+const getSevenDays = (request, response) => {
+  // Current date
+const currentDate = new Date();
+
+const sevenDays = currentDate.setDate(currentDate.getDate() - 7);
+
+  Payloads.find({ date: { $gte: sevenDays, $lte: currentDate } })
+    .then((results) => {
+      response.send(results);
+    })
+    .catch((errors) => {
+      response.send(
+        `Id:Error Fetching payload by date and hour group,message:${errors}`
+      );
+    });
+};
+
+//Getting data generated the previous day
+const getYesterday = (request, response) => {
+  // Current date
+const currentDate = new Date();
+
+const yesterday = currentDate.setDate(currentDate.getDate() - 1);
+
+  Payloads.find({ date: { $gte: yesterday, $lte: currentDate } })
+    .then((results) => {
+      response.send(results);
+    })
+    .catch((errors) => {
+      response.send(
+        `Id:Error Fetching payload by date and hour group,message:${errors}`
+      );
+    });
+};
+
+//Getting data generated today
+const getToday = (request, response) => {
+  // Current date
+const currentDate = new Date();
+
+  Payloads.find({ date: currentDate })
+    .then((results) => {
+      response.send(results);
+    })
+    .catch((errors) => {
+      response.send(
+        `Id:Error Fetching payload by date and hour group,message:${errors}`
+      );
+    });
+};
+
+
+
 module.exports = {
   createHourGroup,
   updateHourGroup,
@@ -365,4 +437,8 @@ module.exports = {
   firstTimeRunning,
   getSpecific,
   createPayloadOnly,
+  getThirtyDays,
+  getSevenDays,
+  getYesterday,
+  getToday,
 };
