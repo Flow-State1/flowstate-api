@@ -1,2 +1,2 @@
-{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"6515ad3c43cbe33f7032da46","applience_id":"S2124FE_16:16_202309-30","applience_brand":"Dell","applience_variant":"S2124FE"}
-{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"6515ad3c43cbe33f7032da46","applience_id":"Screen5_16:16_202309-30","applience_brand":"Asus","applience_variant":"Screen5"}
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"Laptop 15_21:12_202310-01","applience_brand":"Hp","applience_variant":"Laptop 15"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"64e1f441c5c8a70adfc93c0d","applience_id":"Ideapad3_21:12_202310-01","applience_brand":"Lenovo","applience_variant":"Ideapad3"}

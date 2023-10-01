@@ -109,10 +109,22 @@ const CreateWebSocketServer = async (server, port) => {
               ? `0${current.getHours()}`
               : current.getHours();
 
+          /**
+           *
+           * {"id":"Shelly.GetStatus","src":"shellyplus1pm-a8032ab11964","dst":"devices/shellyplus1pm-a8032ab11964/messages/events",
+           * "result":{"ble":{},"cloud":{"connected":false},
+           * "input:0":{"id":0,"state":false},"mqtt":{"connected":true},"script:1":{"id":1, "running":true},
+           * "switch:0":{"id":0, "source":"mqtt", "output":false, "apower":0.0, "voltage":237.7, "current":0.000,
+           * "aenergy":{"total":0.000,"by_minute":[0.000,0.000,0.000],"minute_ts":1696186159},"temperature":{"tC":63.7, "tF":146.6}},"sys":{"mac":"A8032AB11964","restart_required":false,"time":"20:49","unixtime":1696186160,"uptime":9681,"ram_size":248472,"ram_free":126116,"fs_size":458752,"fs_free":94208,"cfg_rev":22,"kvs_rev":0,"schedule_rev":0,"webhook_rev":0,"available_updates":{"stable":{"version":"1.0.3"}}},"wifi":{"sta_ip":"172.20.10.3","status":"got ip","ssid":"Leo?s IPhone ","rssi":-58},"ws":{"connected":false}}}
+           */
+
           // Breakdown the message object and extract what is needed only.
           let payload_message = JSON.parse(message);
+          // console.log("Payload: ", payload_message);
           let payload_src = payload_message["src"];
-          let payload_params = payload_message["params"];
+          let result = payload_message["result"];
+          let payload_params = result["switch:0"];
+          // console.log("Params",payload_params);
           let switch_status = payload_params["output"];
           let power = payload_params["apower"] * 0.001; //This converts currently measure power to Kw
           let voltage = payload_params["voltage"];
@@ -445,10 +457,10 @@ const CreateWebSocketServer = async (server, port) => {
     });
 
     //Add the websocket server as a subscriver to the topics of both devices
-    MQTTClient.subscribe(process.env.SWITCH_SUBSCRIBERTOPIC1.toString());
-    MQTTClient.subscribe(process.env.SWITCH_SUBSCRIBERTOPIC2.toString());
-    MQTTClient.subscribe("test");
-    MQTTClient.subscribe("test2");
+    MQTTClient.subscribe(process.env.SUBSCRIBERTOPIC1.toString());
+    MQTTClient.subscribe(process.env.SUBSCRIBERTOPIC2.toString());
+    // MQTTClient.subscribe("test");
+    // MQTTClient.subscribe("test2");
 
     ws.onclose = (event) => {
       console.log("Client closed connection to socket");

@@ -126,7 +126,7 @@ const userSession = (req,res)=>{
       console.error("Error writing to file:", err);
     }
   })
-  res.sendStatus(200)
+  res.status(200).send(id);
 }
 
 module.exports = {
