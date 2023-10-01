@@ -17,6 +17,7 @@ const userRouter = require("./router/userRouter");
 const consumptions = require('./router/consumptionRouter');
 const payload = require('./router/PayloadRouter');
 const appliences = require('./router/applienceRouter');
+const electronics = require('./router/electronicRouter');
 //Create an http server with the express app
 const http = require("http");
 const server = http.createServer(app);
@@ -76,3 +77,4 @@ app.use('/users', userRouter);
 app.use('/consumptions', consumptions);
 app.use('/payload', payload);
 app.use('/appliences', appliences);
+app.use('/electronics', electronics);

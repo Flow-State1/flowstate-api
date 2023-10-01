@@ -151,7 +151,9 @@ exports.protect = (async (req, res, next) => {
 exports.forgotPassword = (async (req, res, next) => {
     try {
         // 1. Get user from the database based on the email provided in the request body
-        const user = await User.findOne({ email: req.body.email });
+        const {inputValue} = req.body;
+        const {email} = inputValue;
+        const user = await User.findOne({email: req.body.email});
         if(!user) {
             return next(res.status(404).json({
                 status: 'fail',
@@ -177,7 +179,6 @@ exports.forgotPassword = (async (req, res, next) => {
                 subject: 'Your Password Reset Token(valid for 10 min)',
                 message
             });
-    
             res.status(200).json({
                 status: 'success',
                 message: 'Token sent to email'
@@ -277,3 +278,58 @@ exports.logout = (async (req, res) => {
     });
     res.status(200).json({ status: 'success' });
 });
+
+
+// exports.forgotPassword = async (req, res) => {
+
+//     //const {email} = req.body;
+//     const {inputValue} = req.body;
+//     const {email} = inputValue;
+//     const newRequestBody = {email};
+//     console.log(newRequestBody);
+
+//     try {
+//         const user = await User.findOne({email});
+
+//         if(!user) {
+//             return res.status(404).json({
+//                 status: 'fail',
+//                 message: 'User does not exist!'
+//             });
+//         }
+
+//         const jwtSecret = secret + user.password;
+//         const userToken = jwt.sign( { email: user.email, id: user._id}, jwtSecret, {
+//             expiresIn: "5m",
+//         });
+
+//         const link = `http://localhost:3001/users/reset-password/${user._id}/${userToken}`;
+
+//         console.log(link);
+//     }catch(error) {
+//         console.log(error);
+//     }
+// };
+
+// exports.resetPassword = async (req, res) => {
+//     const { id, userToken } = req.params;
+//     console.log(req.params);
+
+//     const user = await User.findOne({ _id: id });
+//     if(!user) {
+//         return res.status(404).json({
+//             status: 'fail',
+//             message: 'User does not exist!'
+//         });
+//     }
+
+//     const jwtSecret = secret + user.password;
+
+//     try {
+//         const verify = jwt.verify(userToken, jwtSecret);
+//         res.send("Verified");
+//     } catch(error) {
+//         res.send("Not verified");
+//     }
+
+// };

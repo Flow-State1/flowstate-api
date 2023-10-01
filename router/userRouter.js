@@ -71,8 +71,11 @@ userRouter.post('/login', authController.login);
 userRouter.get('/logout', authController.logout);
 
 //Endpoint relevant for password resetting operations
-userRouter.post('/forgotPassword', authController.forgotPassword);
+userRouter.post('/forgot-Password', authController.forgotPassword);
 userRouter.patch('/resetPassword/:token', authController.resetPassword);
+
+//userRouter.post('/forgot-password', authController.forgotPassword);
+//userRouter.get('/reset-password/:id/:token', authController.resetPassword);
 
 //Endpoint relevant for updating authenticated users, hense the route is protected
 userRouter.post('/updateMyPassword', authController.protect, authController.updatePassword);
@@ -95,6 +98,8 @@ userRouter
   .route('/:id')
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(authController.protect, userController.deleteUser);
+  .delete(authController.protect, userController.deleteUser)
+  .post(userController.userSession);
+
 
 module.exports = userRouter;
