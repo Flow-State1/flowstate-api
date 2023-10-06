@@ -118,16 +118,16 @@ const deleteUser = (async (req, res) => {
 // }
 
 // Create a controller to create a user session file, with the user id in the file
-const userSession = (req,res)=>{
-  const id = req.params.id;
-  console.log("File with user id: ",id)
-  fs.writeFile("./data/user.txt", id , (err) => {
-    if (err) {
-      console.error("Error writing to file:", err);
-    }
-  })
-  res.status(200).send(id);
-}
+// const userSession = (req,res)=>{
+//   const id = req.params.id;
+//   console.log("File with user id: ",id)
+//   fs.writeFile("./data/user.txt", id , (err) => {
+//     if (err) {
+//       console.error("Error writing to file:", err);
+//     }
+//   })
+//   res.status(200).send(id);
+// }
 
 module.exports = {
   getAllUsers,
@@ -137,5 +137,5 @@ module.exports = {
   updateUser, 
   deleteUser,
   deleteMe,
-  userSession
+
 }
