@@ -4,9 +4,10 @@ const authController = require("../controllers/authController");
 const Appliences = require("../models/Appliences");
 
 
-router.post("/", (request, response) => {
+router.post("/", async (request, response) => {
   const { device1Object, device2Object } = request.body;
   const date = new Date();
+  // console.log("Device1 object:",device1Object);
   const applience_id1 = `${
     device1Object.applience_variant
   }_${date.getHours()}:${
@@ -17,6 +18,20 @@ router.post("/", (request, response) => {
   }_${date.getHours()}:${
     date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
   }`;
+
+  // Firstly find the appliences that have a similar shelly ID and set that shelly id to null then proceed to adding the new documents
+  let shelly1 = device1Object.device_id;
+  let shelly2 = device2Object.device_id
+
+  // console.log("Shelly 1 id: ",shelly1);
+  // console.log("Shelly 2 id: ",shelly2);
+
+  // applience_id: { $in: applience_id }
+  await Appliences.updateMany({device_id:{$in:[shelly1,shelly2]}},{device_id:null}).then((result)=>{
+    console.log("Result for updating: ","\n",result);
+  }).catch((err)=>{
+    console.log(err);
+  })
 
   Appliences.insertMany([
     {
