@@ -22,12 +22,12 @@ router.post("/dashboard", (request, response) => {
 
   try {
     const { applience_id } = request.body;
-    console.log("App ID",applience_id);
+    // console.log("App ID",applience_id);
     Payloads.find({
       applience_id: { $in: applience_id },
       
     }).then((res) => {
-      // console.log(res);
+      // console.log("Find on results array",res);
       let data = [];
       res.forEach((element) => {
         // Convert date
@@ -49,13 +49,11 @@ router.post("/dashboard", (request, response) => {
       let object = {};
       // Filter the array according to the applience_id
 
-      
-
       applience_id.forEach((applience) => {
         let filtered = data.filter((item) => item.applience_id == applience);
         object[applience] = filtered;
       });
-
+      // console.log("Object: ",object);
       response.send(object);
     });
   } catch (err) {
