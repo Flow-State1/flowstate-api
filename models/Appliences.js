@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+//const device = require("./Devices");
 
 const applienceSchema = new Schema({
     applience_id:{
@@ -17,6 +18,10 @@ const applienceSchema = new Schema({
     applience_variant:{
         type:String,
         required:true
+    },
+    device_id:{
+        type:String,
+        required:false
     }
 });
 

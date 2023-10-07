@@ -96,7 +96,7 @@ userRouter
   .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(authController.protect, userController.deleteUser)
-  .post(userController.userSession);
+  // .post(userController.userSession);
 
 
 module.exports = userRouter;

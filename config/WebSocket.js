@@ -1,12 +1,17 @@
-const WebSocket = require("ws");
+//const WebSocket = require("ws");
 const MQTTClient = require("./MQTTConnection");
 require("dotenv").config();
 const Payloads = require("../models/Payload");
 const fs = require("fs");
+const { log } = require("console");
 let user_id = "";
 
+const { Server } = require("socket.io");
+
 const CreateWebSocketServer = async (server, port) => {
-  const WebSocketServer = new WebSocket.Server({ server });
+  //const WebSocketServer = new WebSocket.Server({ server });
+
+  const WebSocketServer = new Server(server);
 
   console.log("Web socket listening on ", port);
   let date = new Date();
@@ -39,7 +44,7 @@ const CreateWebSocketServer = async (server, port) => {
           }
 
           user_id = data.toString().trim();
-          console.log("User with id: ", user_id);
+          console.log("User with id2: ", user_id);
 
           callback(null); // Indicate success
         });
@@ -47,7 +52,7 @@ const CreateWebSocketServer = async (server, port) => {
         console.log("File not present, meaning no user, logged in");
       }
     }
-    console.log("User with id: ", user_id);
+    console.log("User with id2: ", user_id);
     readUserFileAndProcess(async (err) => {
       if (err) {
         console.error("Error processing file:", err);
@@ -109,14 +114,13 @@ const CreateWebSocketServer = async (server, port) => {
               ? `0${current.getHours()}`
               : current.getHours();
 
-          /**
-           *
-           * {"id":"Shelly.GetStatus","src":"shellyplus1pm-a8032ab11964","dst":"devices/shellyplus1pm-a8032ab11964/messages/events",
-           * "result":{"ble":{},"cloud":{"connected":false},
-           * "input:0":{"id":0,"state":false},"mqtt":{"connected":true},"script:1":{"id":1, "running":true},
-           * "switch:0":{"id":0, "source":"mqtt", "output":false, "apower":0.0, "voltage":237.7, "current":0.000,
-           * "aenergy":{"total":0.000,"by_minute":[0.000,0.000,0.000],"minute_ts":1696186159},"temperature":{"tC":63.7, "tF":146.6}},"sys":{"mac":"A8032AB11964","restart_required":false,"time":"20:49","unixtime":1696186160,"uptime":9681,"ram_size":248472,"ram_free":126116,"fs_size":458752,"fs_free":94208,"cfg_rev":22,"kvs_rev":0,"schedule_rev":0,"webhook_rev":0,"available_updates":{"stable":{"version":"1.0.3"}}},"wifi":{"sta_ip":"172.20.10.3","status":"got ip","ssid":"Leo?s IPhone ","rssi":-58},"ws":{"connected":false}}}
-           */
+          
+            // {"id":"Shelly.GetStatus","src":"shellyplus1pm-a8032ab11964","dst":"devices/shellyplus1pm-a8032ab11964/messages/events",
+            // "result":{"ble":{},"cloud":{"connected":false},
+            // "input:0":{"id":0,"state":false},"mqtt":{"connected":true},"script:1":{"id":1, "running":true},
+            // "switch:0":{"id":0, "source":"mqtt", "output":false, "apower":0.0, "voltage":237.7, "current":0.000,
+            // "aenergy":{"total":0.000,"by_minute":[0.000,0.000,0.000],"minute_ts":1696186159},"temperature":{"tC":63.7, "tF":146.6}},"sys":{"mac":"A8032AB11964","restart_required":false,"time":"20:49","unixtime":1696186160,"uptime":9681,"ram_size":248472,"ram_free":126116,"fs_size":458752,"fs_free":94208,"cfg_rev":22,"kvs_rev":0,"schedule_rev":0,"webhook_rev":0,"available_updates":{"stable":{"version":"1.0.3"}}},"wifi":{"sta_ip":"172.20.10.3","status":"got ip","ssid":"Leo?s IPhone ","rssi":-58},"ws":{"connected":false}}}
+           
 
           // Breakdown the message object and extract what is needed only.
           let payload_message = JSON.parse(message);
@@ -126,7 +130,7 @@ const CreateWebSocketServer = async (server, port) => {
           let payload_params = result["switch:0"];
           // console.log("Params",payload_params);
           let switch_status = payload_params["output"];
-          let power = payload_params["apower"] * 0.001; //This converts currently measure power to Kw
+          let power = payload_params["apower"]  0.001; //This converts currently measure power to Kw
           let voltage = payload_params["voltage"];
           let current_ = payload_params["current"];
           let aenergy = payload_params["aenergy"]["total"];
@@ -139,319 +143,38 @@ const CreateWebSocketServer = async (server, port) => {
             voltage,
             current: current_,
             aenergy,
+            label:`${current_hour}:${current_minute}`
           };
-
+          let res = payload
+          console.log(res);
+          //WebSocketServer.clients.forEach(function each(client) {
+           // if (client === ws && client.readyState === WebSocket.OPEN) {
+            // This is sending the same message 8 times
+            WebSocketServer.emit("message", payload);
+            //}
+          //});
           // Compare previously stored hour with currenlty stored hour
           //   console.log("Devices array length: ",devices.length);
 
           // Check the switch status and the power and if switch is on and no device is plugged in, send an alert, we can store previous power and previous current, and just use them to check
-          if (stored_hour != current_hour) {
-            // Create a new payload and register devices to database
-
-            if (payload_src == process.env.CLIENTID1) {
-              try {
-                const Payload = new Payloads({
-                  user_id,
-                  id: payload_src,
-                  applience_id: shelly1.applience_id,
-                  date: `${year}-${month}-${day}`,
-                  hour: `${current.getHours()}:00`,
-                  labels_array: [],
-                  data: {
-                    apower: power,
-                    voltage: voltage,
-                    current: current_,
-                    aenergy: aenergy,
-                  },
-                });
-                // Check if paylaod to be created already exist
-                let results = await Payloads.find({
-                  user_id,
-                  id: payload_src,
-                  applience_id: shelly1.applience_id,
-                  hour: `${current.getHours()}:00`,
-                });
-                if (results.length >= 2) {
-                  console.log("Payloads exist");
-                } else if (results.length == 0) {
-                  Payload.save()
-                    .then((saved) => {
-                      console.log("Payload created");
-                    })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-                }
-              } catch (err) {
-                console.log(err);
-              }
-            } else if (payload_src == process.env.CLIENTID2) {
-              const Payload = new Payloads({
-                user_id,
-                id: payload_src,
-                applience_id: shelly2.applience_id,
-                date: `${year}-${month}-${day}`,
-                hour: `${current.getHours()}:00`,
-                labels_array: [],
-                data: {
-                  apower: power,
-                  voltage: voltage,
-                  current: current_,
-                  aenergy: aenergy,
-                },
-              });
-              //   Check if there is payload with defined info for creating new one
-              let results = await Payloads.find({
-                user_id,
-                id: payload_src,
-                applience_id: shelly2.applience_id,
-                hour: `${current.getHours()}:00`,
-              });
-              if (results.length >= 2) {
-                console.log("Payloads exist");
-              } else if (results.length == 0) {
-                Payload.save()
-                  .then((saved) => {
-                    stored_hour = current_hour;
-                    console.log("Payload created and hour changed");
-                  })
-                  .catch((err) => {
-                    response.send(err);
-                  });
-              }
-            }
-          } else {
-            if (stored_minute != current_minute) {
-              // console.log("Stored Minute: ",stored_minute);
-              // console.log("Current minute: ",current_minute,"\n");
-              stored_minute = current_minute;
-              topic1 = 0;
-              topic2 = 0;
-            } else {
-              // console.log("Stored Minute: ",stored_minute);
-              // console.log("Current minute: ",current_minute,"\n");
-              if (payload_src == process.env.CLIENTID1 && topic1 == 0) {
-                // Update appropriate Payload
-                payload.applience_id = shelly1.applience_id;
-                topic1 = 1;
-                console.log(
-                  "Payload 1 at ",
-                  `${current_hour}:${current_minute}`,
-                  "",
-                  payload
-                );
-                try {
-                  let hour =
-                    current.getHours() < 10
-                      ? `0${current.getHours()}`
-                      : current.getHours() + ":00";
-                  const result = await Payloads.findOne({
-                    id: payload_src,
-                    user_id: user_id,
-                    applience_id: payload.applience_id,
-                    hour: hour,
-                  });
-                  console.log(
-                    "Results for user:",
-                    user_id,
-                    " \n",
-                    payload_src,
-                    " and ",
-                    payload.applience_id,
-                    "at",
-                    hour,
-                    " ",
-                    result,
-                    " \n"
-                  );
-
-                  let labels = result.labels_array;
-                  console.log("Array from DB before update: ", labels);
-                  let dataArray = result.data;
-                  labels.push(
-                    `${
-                      current.getHours() < 10
-                        ? `0${current.getHours()}`
-                        : current.getHours()
-                    }:${
-                      current.getMinutes() < 10
-                        ? `0${current.getMinutes()}`
-                        : current.getMinutes()
-                    }`
-                  );
-                  console.log("Array to be sent to db: ", labels);
-                  let data = {
-                    apower: power,
-                    voltage,
-                    current: current_,
-                    aenergy,
-                  };
-                  dataArray.push(data);
-                  // console.log(labels);
-
-                  await Payloads.updateOne(
-                    {
-                      id: payload_src,
-                      user_id: user_id,
-                      applience_id: payload.applience_id,
-                      hour: hour,
-                    },
-                    {
-                      labels_array: labels,
-                      data: dataArray,
-                    }
-                  );
-                  const UpdatedPayload = await Payloads.findOne({
-                    id: payload_src,
-                    user_id: user_id,
-                    applience_id: payload.applience_id,
-                    hour: hour,
-                  });
-
-                  WebSocketServer.clients.forEach(function each(client) {
-                    if (client === ws && client.readyState === WebSocket.OPEN) {
-                      // console.log(
-                      //   "Uprocessed Updated Data: ",
-                      //   UpdatedPayload["data"]
-                      // );
-
-                      let json = {
-                        payload_src,
-                        labels_array: UpdatedPayload["labels_array"],
-                        data: UpdatedPayload["data"],
-                      };
-                      const resultPayload = JSON.stringify(json);
-                      // console.log("Updated Data: ", resultPayload);
-                      try {
-                        //Parse the incoming messages to json format
-                        //   parsedMessage = JSON.stringify(UpdatedPayload);
-                        console.log("Sending data for: ", payload_src);
-                        client.send(resultPayload);
-                        //let src = parsedMessage.src;
-                      } catch (error) {
-                        console.error("Error parsing MQTT message:", error);
-                        return;
-                      }
-                    } else {
-                      console.log("Clients websockets not open");
-                    }
-                  });
-                  // console.log("Data updated");
-                } catch (err) {
-                  console.log(err);
-                }
-              } else if (payload_src == process.env.CLIENTID2 && topic2 == 0) {
-                // Update appropriate payload
-                payload.applience_id = shelly2.applience_id;
-                topic2 = 1;
-                console.log(
-                  "Payload 2  at ",
-                  `${current_hour}:${current_minute}`,
-                  "",
-                  payload
-                );
-                try {
-                  let hour =
-                    current.getHours() < 10
-                      ? `0${current.getHours()}`
-                      : current.getHours() + ":00";
-                  const result = await Payloads.findOne({
-                    id: payload_src,
-                    user_id: user_id,
-                    applience_id: payload.applience_id,
-                    hour: hour,
-                  });
-                  console.log(
-                    "Results for user:",
-                    user_id,
-                    " \n",
-                    payload_src,
-                    " and ",
-                    payload.applience_id,
-                    "at",
-                    hour,
-                    " ",
-                    result,
-                    " \n"
-                  );
-
-                  let labels = result.labels_array;
-                  let dataArray = result.data;
-                  labels.push(
-                    `${
-                      current.getHours() < 10
-                        ? `0${current.getHours()}`
-                        : current.getHours()
-                    }:${
-                      current.getMinutes() < 10
-                        ? `0${current.getMinutes()}`
-                        : current.getMinutes()
-                    }`
-                  );
-
-                  let data = {
-                    apower: power,
-                    voltage,
-                    current: current_,
-                    aenergy,
-                  };
-                  dataArray.push(data);
-                  // console.log(labels);
-
-                  await Payloads.updateOne(
-                    {
-                      id: payload_src,
-                      user_id: user_id,
-                      applience_id: payload.applience_id,
-                      hour: hour,
-                    },
-                    {
-                      labels_array: labels,
-                      data: dataArray,
-                    }
-                  );
-                  const UpdatedPayload = await Payloads.findOne({
-                    id: payload_src,
-                    user_id: user_id,
-                    applience_id: payload.applience_id,
-                    hour: hour,
-                  });
-                  // console.log("Updated Data: ",resultPayload[]);
-                  WebSocketServer.clients.forEach(function each(client) {
-                    if (client === ws && client.readyState === WebSocket.OPEN) {
-                      // console.log(
-                      //   "Uprocessed Updated Data: ",
-                      //   UpdatedPayload
-                      // );
-
-                      let json = {
-                        payload_src,
-                        labels_array: UpdatedPayload["labels_array"],
-                        data: UpdatedPayload["data"],
-                      };
-                      const resultPayload = JSON.stringify(json);
-                      // console.log("Updated Data: ", resultPayload);
-                      try {
-                        //Parse the incoming messages to json format
-                        //   parsedMessage = JSON.stringify(UpdatedPayload);
-                        console.log("Sending data for: ", payload_src);
-                        client.send(resultPayload);
-                        //let src = parsedMessage.src;
-                      } catch (error) {
-                        console.error("Error parsing MQTT message:", error);
-                        return;
-                      }
-                    } else {
-                      console.log("Clients websockets not open");
-                    }
-                  });
-                  // console.log("Data updated");
-                } catch (err) {
-                  console.log(err);
-                }
-              }
-            }
-          }
+          // if (stored_minute != current_minute) {
+          //   console.log("Minute different");
+          //   stored_minute = current_minute;
+          //   if (payload_src == process.env.CLIENT1) {
+          //     WebSocketServer.clients.forEach(function each(client) {
+          //       if (client === ws && client.readyState === WebSocket.OPEN) {
+          //         client.emit("message", payload);
+          //       }
+          //     });
+          //   }
+          //   if (payload_src == process.env.CLIENT2) {
+          //     WebSocketServer.clients.forEach(function each(client) {
+          //       if (client === ws && client.readyState === WebSocket.OPEN) {
+          //         client.emit("message", payload);
+          //       }
+          //     });
+          //   }
+          // }
         });
       });
     });

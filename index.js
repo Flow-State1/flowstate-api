@@ -21,7 +21,8 @@ const electronics = require('./router/electronicRouter');
 //Create an http server with the express app
 const http = require("http");
 const server = http.createServer(app);
-const WebSocketServer = require("./config/WebSocket");
+// const WebSocketServer = require("./config/WebSocket");
+const createServer = require("./config/MQTTPayload");
 
 //Set security HTTP headers
 app.use(helmet());
@@ -61,7 +62,7 @@ mongoose
 //This creates an instance of the WebSocket server and listens to the same port as http server, this will be used for realtime data
 //To get real time data the client should connect to the websocket then it will get a response sent to it whenever the websocket server receives a message
 //For now to use the websocket it needs a client to send a message to it then the websocket will display the messages from the Shelly device
-WebSocketServer(server, port);
+createServer(server, port);
 
 //Routes
 app.use(cors({
