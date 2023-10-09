@@ -26,7 +26,7 @@ const createServer = () => {
       });
 
       newData.save().then((response) => {
-        // console.log("Response for applience_id: ",result["applience_id"]," ", response);
+        console.log("Response for applience_id: ",result["applience_id"]," ", response);
       });
     }
   });
