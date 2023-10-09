@@ -6,7 +6,7 @@ const createServer = () => {
   MQTTClient.on("message", async (_, message) => {
     const data = await JSON.parse(message);
 
-    // console.log("Data received",data);
+    console.log("Data received",data);
     // This is returning the first applience it finds with that specific device_id(Basically can only work if there are only 2 devices registered)
     const result = await Appliences.findOne({ device_id: data["src"] });
     console.log("Results for applience with id: ",data["src"],"\n",result );
