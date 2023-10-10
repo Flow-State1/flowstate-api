@@ -81,8 +81,8 @@ router.post("/", async (request, response) => {
   //       applience_id2: result2,
   //     }));
       return response.json({
-        applience_id1: applience_id1,
-        applience_id2: applience_id2,
+        applience_id1: result[0].applience_id,
+        applience_id2: result[1].applience_id,
       });
     } else {
       console.log("Server error");
