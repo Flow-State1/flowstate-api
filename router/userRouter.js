@@ -71,7 +71,7 @@ userRouter.post('/login', authController.login);
 userRouter.get('/logout', authController.logout);
 
 //Endpoint relevant for password resetting operations
-userRouter.post('/forgot-Password', authController.forgotPassword);
+userRouter.post('/forgotPassword', authController.forgotPassword);
 userRouter.patch('/resetPassword/:token', authController.resetPassword);
 
 //userRouter.post('/forgot-password', authController.forgotPassword);

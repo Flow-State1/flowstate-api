@@ -1,0 +1,2 @@
+{"device":1,"id":"shellyplus1pm-a8032ab11964","user_id":"","applience_id":"myPC_9:02_202310-02","applience_brand":"Apple","applience_variant":"myPC"}
+{"device":2,"id":"shellyplus1pm-7c87ce719ccc","user_id":"","applience_id":"myWorkMontior_9:02_202310-02","applience_brand":"Dell","applience_variant":"myWorkMontior"}

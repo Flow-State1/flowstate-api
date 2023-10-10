@@ -151,8 +151,8 @@ exports.protect = (async (req, res, next) => {
 exports.forgotPassword = (async (req, res, next) => {
     try {
         // 1. Get user from the database based on the email provided in the request body
-        const {inputValue} = req.body;
-        const {email} = inputValue;
+        // const {inputValue} = req.body;
+        // const {email} = inputValue;
         const user = await User.findOne({email: req.body.email});
         if(!user) {
             return next(res.status(404).json({
