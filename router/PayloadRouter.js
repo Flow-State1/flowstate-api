@@ -67,4 +67,66 @@ router.get("/seven", PayloadController.getSevenDays);
 router.get("/yesterday", PayloadController.getYesterday);
 router.get("/today", PayloadController.getToday);
 
+
+// Create a router to get payloads based on the applienceid, then filter it using the date specified by the user
+router.post("/analytics",async(request,response)=>{
+  const {applience_id,date} = request.body;
+  // console.log("Appliece: ",applience_id);
+  // console.log("date: ",date);
+  await Payloads.find({
+    applience_id:applience_id
+  }).then((result)=>{
+    // console.log("Result: ",result);
+    let filteredArray = [];
+    result.forEach((payload)=>{
+      let dateFormated = new Date(parseInt(payload.date)).toLocaleString()
+      if(dateFormated.includes(`${date}`) && payload.applience_id===applience_id){
+        // console.log("Dateformated: ",dateFormated);
+        filteredArray.push(payload);
+      }
+    })
+    // console.log(filteredArray);
+    response.send(filteredArray);
+  })
+})
+
+// Create a router to get payloads based on the applienceid, then filter it using the date specified by the user
+router.post("/analytics/hour",async(request,response)=>{
+  const {applience_id,date,hour} = request.body;
+  console.log("Appliece: ",applience_id);
+  console.log("date: ",date);
+  console.log("hour: ",hour);
+  await Payloads.find({
+    applience_id:applience_id,
+    hour:hour
+  }).then((result)=>{
+    // console.log("Result: ",result);
+    let filteredArray = [];
+    result.forEach((payload)=>{
+      let dateFormated = new Date(parseInt(payload.date)).toLocaleString()
+      if(dateFormated.includes(`${date}`) && payload.applience_id===applience_id){
+        // console.log("Dateformated: ",dateFormated);
+        filteredArray.push(payload);
+      }
+
+    })
+    // console.log(filteredArray);
+    response.send(filteredArray);
+  })
+})
+
+router.post("/analytics/appliences",async (request,response)=>{
+  const {applience_id} = request.body;
+
+  await Payloads.find({
+    applience_id:{$in:applience_id}
+  }).then((res)=>{
+    response.send(res);
+  })
+
+})
+ 
+
+
+
 module.exports = router;
