@@ -202,6 +202,7 @@ router.post("/", async (request, response) => {
   //   });
 });
 
+// Get user appliences by ID
 router.get("/:id", (request, response) => {
   const { id } = request.params;
   try {
@@ -216,6 +217,8 @@ router.get("/:id", (request, response) => {
     response.send(err);
   }
 });
+
+
 
 module.exports = router;
 //
