@@ -46,11 +46,12 @@ const updateMe = (async (req, res, next) => {
     }
     // 2. Update user document
     //Filtered out unwanted fields that can't be updated and  kept the name and email
-    const filteredBody = filterObj(req.body, "name", "email");
-    console.log("New data:",filteredBody);
-    //if(req.file) filteredBody.photo = req.file.filename;
+    const { name, email } = req.body.updateInput;
+    console.log(`Name: ${name}, Email: ${email}`);
 
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    const updatedFields = {name, email};
+
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, updatedFields, {
       new: true, 
       runValidators: true
     });
@@ -66,6 +67,7 @@ const updateMe = (async (req, res, next) => {
     console.log(err);
   }
 });
+
 
 //Function for deactivating the user when they delete their account
 const deleteMe = (async (req, res, next) => {
@@ -104,30 +106,6 @@ const deleteUser = (async (req, res) => {
   });
   
 });
-
-
-// const getUser =(req,res)=>{
-//   const id = req.params.id;
-//   User.findOne({
-//     _id:`${id}`
-//   }).then((results)=>{
-//     res.send(results)
-//   }).catch((err)=>{
-//     res.send(err)
-//   })
-// }
-
-// Create a controller to create a user session file, with the user id in the file
-// const userSession = (req,res)=>{
-//   const id = req.params.id;
-//   console.log("File with user id: ",id)
-//   fs.writeFile("./data/user.txt", id , (err) => {
-//     if (err) {
-//       console.error("Error writing to file:", err);
-//     }
-//   })
-//   res.status(200).send(id);
-// }
 
 module.exports = {
   getAllUsers,
