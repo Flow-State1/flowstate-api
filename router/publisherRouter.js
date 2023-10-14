@@ -15,9 +15,7 @@ publisher.subscribe(switch_sub2);
 router.post("/", publisherController.publish_message_post);
 
 router.post("/switch/1", (request, response) => {
-  publisher.on("message", (topic,message) => {
-    response.send(`${topic}\n${message}`);
-  });
+  response.sendStatus(200);
   publisher.publish(toggle_switch1, switch_command1);
 });
 router.post("/switch/2", (request, response) => {
