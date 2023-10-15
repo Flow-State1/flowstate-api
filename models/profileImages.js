@@ -3,15 +3,9 @@ const Schema = mongoose.Schema;
 
 const ProfileImageSchema = new Schema({
   //Image string
-  image: {
-    type: String,
-    required: true,
-  },
+  image: String,
   // User ID
-  userId: {
-    type: String,
-    required: true,
-  }
+  userId: String
 });
 
 const Images = mongoose.model("ProfileImage", ProfileImageSchema);

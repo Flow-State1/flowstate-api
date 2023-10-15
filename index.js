@@ -18,6 +18,7 @@ const consumptions = require('./router/consumptionRouter');
 const payload = require('./router/PayloadRouter');
 const appliences = require('./router/applienceRouter');
 const electronics = require('./router/electronicRouter');
+const images = require('./router/imageRouter');
 //Create an http server with the express app
 const http = require("http");
 const server = http.createServer(app);
@@ -69,6 +70,18 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 }));
+
+app.use(bodyParser.json({limit: "100mb"}));
+app.use(express.json({limit: '100mb'}));
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: '100mb',
+    parameterLimit: 500000,
+  }),
+);
+
 app.use(cookieParser());
 app.use(express.json()); //To allow data to be received and processed in json format
 app.use("/publish", publish);
@@ -79,3 +92,4 @@ app.use('/consumptions', consumptions);
 app.use('/payload', payload);
 app.use('/appliences', appliences);
 app.use('/electronics', electronics);
+app.use('/images', images);
